@@ -1,0 +1,28 @@
+{{define "layout"}}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body style="font-family: 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background-color: #f8fafc; margin: 0; padding: 40px 10px;">
+    <div style="max-width: 550px; margin: 0 auto; background-color: #ffffff; border: 1px solid #e2e8f0; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);">
+        
+        <div style="padding: 40px 20px 20px; text-align: center;">
+            <img src="https://cdn.jsdelivr.net/gh/Mohamedev2004/axiom_assets@main/logo.png"
+                alt="EduclyPro Logo"
+                width="56"
+                height="56"
+                style="display: block; width: 56px; height: 56px; margin: 0 auto 16px; border: 0; outline: none; text-decoration: none;">            
+            <div style="font-size: 20px; font-weight: bold; color: #000000; letter-spacing: 0.05em; margin-bottom: 8px;">EduclyPro.</div>
+        </div>
+
+        <hr style="border: 0; border-top: 1px solid #f1f5f9; margin: 0;">
+
+        <div style="padding: 10px 40px;">
+            {{template "content" .}}
+        </div>
+    </div>
+</body>
+</html>
+{{end}}

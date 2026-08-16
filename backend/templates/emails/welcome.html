@@ -1,0 +1,20 @@
+{{define "content"}}
+<div style="text-align: center;">
+    <p style="font-size: 16px; font-weight: 600; color: #0f172a; margin-bottom: 24px;">Hey {{.Username}},</p>
+    
+    <p style="font-size: 14px; color: #64748b; line-height: 1.6; margin-bottom: 32px;">
+        Welcome to <strong>EduclyPro!</strong> We're thrilled to have you here.
+    </p>
+    
+    <div style="text-align: center; margin-bottom: 32px;">
+        <a href="{{.DashboardURL}}" 
+           style="display: inline-block; background-color: #1447E6; color: #ffffff !important; padding: 10px 24px; text-decoration: none; border-radius: 8px; font-weight: 500; font-size: 14px; text-align: center; border: 1px solid #18181b;">
+            Go to dashboard
+        </a>
+    </div>
+
+    <p style="font-size: 13px; color: #94a3b8; line-height: 1.5;">
+        If you have any questions, feel free to reach out to our support team.
+    </p>
+</div>
+{{end}}

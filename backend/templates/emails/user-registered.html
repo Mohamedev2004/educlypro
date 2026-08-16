@@ -1,0 +1,18 @@
+{{define "content"}}
+<div style="text-align: center;">
+    <p style="font-size: 16px; font-weight: 600; color: #0f172a; margin-bottom: 24px;">Admin Alert,</p>
+    
+    <p style="font-size: 14px; color: #64748b; line-height: 1.6; margin-bottom: 32px;">
+        A new user has just registered on the platform.
+    </p>
+    
+    <div style="background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 16px; text-align: left; margin-bottom: 32px;">
+        <p style="font-size: 13px; color: #64748b; margin: 0 0 8px;"><strong>Username:</strong> {{.Username}}</p>
+        <p style="font-size: 13px; color: #64748b; margin: 0;"><strong>Email:</strong> {{.Email}}</p>
+    </div>
+
+    <p style="font-size: 13px; color: #94a3b8; line-height: 1.5;">
+        You can manage this user from the admin dashboard.
+    </p>
+</div>
+{{end}}
