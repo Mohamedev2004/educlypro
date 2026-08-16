@@ -8,7 +8,7 @@ This codebase implements **audit logging via events**:
 - A dedicated subscriber persists them as `logs.AuditLog` rows.
 - Audit logs are written to a **separate database connection** (`LogsDB`).
 
-The backend also exposes an authenticated **Logs HTTP API** under `/api/v1/logs` for listing, exporting, and serving chart aggregates. The admin UI at `frontend/src/pages/admin/logs.tsx` consumes these endpoints.
+The backend also exposes an authenticated **Logs HTTP API** under `/api/v1/logs` for listing, exporting, and serving chart aggregates. The super admin UI at `frontend/src/pages/super-admin/logs.tsx` consumes these endpoints.
 
 ## Data flow
 

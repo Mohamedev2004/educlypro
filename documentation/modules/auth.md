@@ -8,9 +8,15 @@ The auth system is **cookie-first JWT auth** with **refresh rotation** and **DB-
 - **Frontend**: Axios uses `withCredentials: true` and automatically calls `/auth/refresh` on most `401`s.
 - **Security model**: JWT signature validation **and** a DB lookup of the hashed token to support logout/revocation.
 
+**There is no self-service registration endpoint.** Accounts are provisioned
+two ways: the fixed `super_admin`/`center_owner` accounts created by the
+database seeder (`backend/modules/auth/seeder.go`), and `center_scanner`/
+`center_receptionist` accounts created by a `center_owner` through the staff
+module — see `documentation/modules/staff.md`.
+
 ## Session cookies
 
-On register/login/refresh, the backend sets:
+On login/refresh, the backend sets:
 
 - **`auth_token`**: access JWT
 - **`refresh_token`**: refresh JWT
@@ -83,30 +89,6 @@ The frontend only enables the `me` query when `document.cookie` contains `sessio
 ## API endpoints
 
 All endpoints below are under `/api/v1`.
-
-### `POST /auth/register`
-
-Creates a new user and issues tokens.
-
-Request body:
-
-- `username` (required, 3–100)
-- `email` (required, email, max 150)
-- `password` (required, 6–72)
-- `role` (required, `admin|user`)
-
-Behavior:
-
-- Creates user (password hashed)
-- Issues access + refresh JWTs
-- Stores **hashed** token rows in DB
-- Sets cookies: `auth_token`, `refresh_token`, `session_exists`
-- Emits audit events and notification events (admins + welcome)
-
-Errors:
-
-- `email_taken` (409) when email already exists
-- `invalid_role` (400) when role is not allowed
 
 ### `POST /auth/login`
 
