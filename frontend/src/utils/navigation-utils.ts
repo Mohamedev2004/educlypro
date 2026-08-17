@@ -1,7 +1,15 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import type { Role, User } from "@/api/types/auth.types"
 import type { RolePageGroup } from "@/types/navigation.types"
-import { BellRing, ChartBar, History, Users } from "lucide-react"
+import {
+  BellRing,
+  University,
+  ChartBar,
+  History,
+  QrCode,
+  UserKey,
+  Users,
+} from "lucide-react"
 
 /**
  * Navigation utility functions.
@@ -14,7 +22,7 @@ import { BellRing, ChartBar, History, Users } from "lucide-react"
 const dashboardPathByRole: Record<Role, string> = {
   super_admin: "/super-admin/dashboard",
   center_owner: "/center-owner/dashboard",
-  center_scanner: "/center-scanner/dashboard",
+  center_scanner: "/center-scanner/scanner",
   center_receptionist: "/center-receptionist/dashboard",
 }
 
@@ -46,6 +54,11 @@ export function getRolePages(
             url: "/super-admin/logs",
             icon: History,
           },
+          {
+            title: t("roles.centers"),
+            url: "/super-admin/centers",
+            icon: University,
+          },
         ],
       },
     ]
@@ -64,6 +77,26 @@ export function getRolePages(
           {
             title: t("roles.staff"),
             url: "/center-owner/staff",
+            icon: UserKey,
+          },
+        ],
+      },
+    ]
+  }
+
+  if (user.role === "center_scanner") {
+    return [
+      {
+        label: t("roles.checkIn"),
+        items: [
+          {
+            title: t("roles.scanner"),
+            url: "/center-scanner/scanner",
+            icon: QrCode,
+          },
+          {
+            title: t("roles.students"),
+            url: "/center-scanner/students",
             icon: Users,
           },
         ],

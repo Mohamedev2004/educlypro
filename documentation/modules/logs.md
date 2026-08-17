@@ -79,7 +79,7 @@ Persisted columns:
 
 ## Logs HTTP API
 
-All endpoints are under `/api/v1` and require authentication (`AuthMiddleware`), see:
+All endpoints are under `/api/v1` and require `AuthMiddleware` + `RequireRole("super_admin")` — audit logs span every center and every user's actions, so this is enforced at the route group, not just hidden from other roles' UI. See:
 
 - `backend/modules/logs/routes.go`
 - `backend/modules/logs/handler.go`

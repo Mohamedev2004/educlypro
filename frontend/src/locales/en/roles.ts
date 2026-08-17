@@ -6,10 +6,14 @@ export const roles = {
 
   // Core navigation groups / breadcrumb taglines
   overview: "Overview",
+  checkIn: "Check In",
 
   // Pages
   dashboard: "Dashboard",
   logs: "Activity Logs",
   notifications: "Notifications",
   staff: "Staff",
+  centers: "Centers",
+  scanner: "Scanner",
+  students: "Students",
 }

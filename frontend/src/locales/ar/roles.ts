@@ -4,9 +4,13 @@ export const roles = {
   center_scanner: "ماسح المركز",
   center_receptionist: "موظف استقبال المركز",
   overview: "نظرة عامة",
+  checkIn: "تسجيل الدخول",
 
   dashboard: "لوحة التحكم",
   logs: "السجلات",
   notifications: "الإشعارات",
   staff: "الموظفون",
+  centers: "المراكز",
+  scanner: "الماسح",
+  students: "الطلاب",
 }

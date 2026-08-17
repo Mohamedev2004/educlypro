@@ -9,7 +9,9 @@ import (
 
 func RegisterRoutes(rg *gin.RouterGroup, mainDB *gorm.DB, h *Handler) {
 	logs := rg.Group("/logs")
-	logs.Use(middleware.AuthMiddleware(mainDB))
+	// Audit logs span every center and every user's actions — restricted to
+	// super_admin, not just hidden from other roles' UI/nav.
+	logs.Use(middleware.AuthMiddleware(mainDB), middleware.RequireRole("super_admin"))
 	{
 		logs.GET("", h.List)
 		logs.GET("/chart", h.Chart)

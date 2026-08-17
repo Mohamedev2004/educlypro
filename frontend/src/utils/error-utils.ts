@@ -114,6 +114,13 @@ export function getApiMessage(t: Translate, error: ApiError) {
     staff_create_failed: "staff.errors.createFailed",
     staff_update_failed: "staff.errors.updateFailed",
     staff_delete_failed: "staff.errors.deleteFailed",
+    center_not_found: "centers.errors.notFound",
+    owner_already_assigned: "centers.errors.ownerAlreadyAssigned",
+    centers_list_failed: "centers.errors.loadFailed",
+    centers_create_failed: "centers.errors.createFailed",
+    centers_get_failed: "centers.errors.loadFailed",
+    centers_add_owner_failed: "centers.errors.addOwnerFailed",
+    centers_add_staff_failed: "centers.errors.addStaffFailed",
     network_error: "api.networkError",
   }
 
@@ -137,6 +144,34 @@ export function getNotificationFieldMessage(
     "page.validation.invalid": "notifications.errors.invalidPage",
     "per_page.validation.invalid": "notifications.errors.invalidPerPage",
     "filter.validation.invalid": "notifications.errors.invalidFilter",
+  }
+
+  const key = keyMap[`${field}.${code}`]
+  return key ? t(key) : undefined
+}
+
+/**
+ * Returns a translated error message for centers-specific fields (create
+ * center, add owner, add staff forms).
+ */
+export function getCentersFieldMessage(
+  t: Translate,
+  field: string,
+  code?: string
+) {
+  if (!code) return undefined
+
+  const keyMap: Record<string, string> = {
+    "name.validation.required": "centers.errors.nameRequired",
+    "name.validation.min": "centers.errors.nameMin",
+    "username.validation.required": "centers.errors.usernameRequired",
+    "username.validation.min": "centers.errors.usernameMin",
+    "email.validation.required": "centers.errors.emailRequired",
+    "email.validation.email": "centers.errors.emailInvalid",
+    "email.validation.taken": "centers.errors.emailTaken",
+    "password.validation.required": "centers.errors.passwordRequired",
+    "password.validation.min": "centers.errors.passwordMin",
+    "role.validation.invalid": "centers.errors.roleInvalid",
   }
 
   const key = keyMap[`${field}.${code}`]

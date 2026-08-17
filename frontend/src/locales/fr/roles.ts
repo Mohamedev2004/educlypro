@@ -5,9 +5,13 @@ export const roles = {
   center_receptionist: "Réceptionniste de centre",
 
   overview: "Aperçu",
+  checkIn: "Enregistrement",
 
   dashboard: "Tableau de bord",
   logs: "Journaux d'Activités",
   notifications: "Notifications",
   staff: "Personnel",
+  centers: "Centres",
+  scanner: "Scanner",
+  students: "Étudiants",
 }

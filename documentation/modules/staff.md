@@ -77,6 +77,15 @@ Errors:
 - `email_taken` (409) — email already in use
 - `staff_create_failed` (500)
 
+`Service.Create` resolves the center from the caller (`FindOwnerCenterID`)
+then delegates to a private `createStaffMember` helper. A super admin
+managing an arbitrary center's staff — not their own — goes through a
+second entrypoint on the same service, `CreateForCenter(ctx, centerID,
+actorUserID, req)`, which skips the ownership resolution and trusts the
+given `centerID` directly, but funnels into that same `createStaffMember`
+helper so the actual validation/creation logic only exists once. This is
+what `POST /centers/:id/staff` calls — see `documentation/modules/centers.md`.
+
 ### `PUT /staff/:id`
 
 Updates an existing staff member's profile, role, and/or center-scoped

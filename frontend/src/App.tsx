@@ -23,9 +23,15 @@ const NotificationsPage = lazy(() => import("./pages/notifications"))
 
 // Super Admin
 const SuperAdminLogs = lazy(() => import("./pages/super-admin/logs"))
+const SuperAdminCenters = lazy(() => import("./pages/super-admin/centers"))
+const SuperAdminCenterDetail = lazy(() => import("./pages/super-admin/center-detail"))
 
 // Center Owner
 const CenterOwnerStaff = lazy(() => import("./pages/center-owner/staff"))
+
+// Center Scanner
+const CenterScannerScanner = lazy(() => import("./pages/center-scanner/scanner"))
+const CenterScannerStudents = lazy(() => import("./pages/center-scanner/students"))
 
 export function App() {
   return (
@@ -62,6 +68,8 @@ export function App() {
             }
           />
           <Route path="/super-admin/logs" element={<SuperAdminLogs />} />
+          <Route path="/super-admin/centers" element={<SuperAdminCenters />} />
+          <Route path="/super-admin/centers/:slug" element={<SuperAdminCenterDetail />} />
 
           {/* Center Owner */}
           <Route
@@ -71,10 +79,8 @@ export function App() {
           <Route path="/center-owner/staff" element={<CenterOwnerStaff />} />
 
           {/* Center Scanner */}
-          <Route
-            path="/center-scanner/dashboard"
-            element={<Dashboard dashboardHref="/center-scanner/dashboard" />}
-          />
+          <Route path="/center-scanner/scanner" element={<CenterScannerScanner />} />
+          <Route path="/center-scanner/students" element={<CenterScannerStudents />} />
 
           {/* Center Receptionist */}
           <Route

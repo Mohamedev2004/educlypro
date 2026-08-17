@@ -12,6 +12,7 @@ import { notifications } from "./notifications"
 import { logs } from "./logs"
 import { roles } from "./roles"
 import { staff } from "./staff"
+import { centers } from "./centers"
 import { table } from "./table"
 
 export const ar = {
@@ -29,5 +30,6 @@ export const ar = {
   logs,
   roles,
   staff,
+  centers,
   table,
 } as const

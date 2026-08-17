@@ -35,6 +35,12 @@ type TokenRevoker interface {
 type Service interface {
 	List(ctx context.Context, ownerUserID uint, params ListParams) (*ListResponse, error)
 	Create(ctx context.Context, ownerUserID uint, req *CreateRequest) (*Response, error)
+	// CreateForCenter creates a staff member for an explicit center, skipping
+	// the "resolve center from the caller's own ownership" step Create does.
+	// Used by callers that already know (and are authorized to act on) the
+	// target center directly — e.g. a super_admin managing a center's staff
+	// from the centers module, rather than a center_owner managing their own.
+	CreateForCenter(ctx context.Context, centerID, actorUserID uint, req *CreateRequest) (*Response, error)
 	Update(ctx context.Context, ownerUserID, staffID uint, req *UpdateRequest) (*Response, error)
 	Delete(ctx context.Context, ownerUserID, staffID uint) error
 }
@@ -106,6 +112,18 @@ func (s *service) Create(ctx context.Context, ownerUserID uint, req *CreateReque
 		return nil, ErrCenterMismatch
 	}
 
+	return s.createStaffMember(ctx, centerID, fmt.Sprint(ownerUserID), req)
+}
+
+func (s *service) CreateForCenter(ctx context.Context, centerID, actorUserID uint, req *CreateRequest) (*Response, error) {
+	if req.CenterID != centerID {
+		return nil, ErrCenterMismatch
+	}
+
+	return s.createStaffMember(ctx, centerID, fmt.Sprint(actorUserID), req)
+}
+
+func (s *service) createStaffMember(ctx context.Context, centerID uint, actorID string, req *CreateRequest) (*Response, error) {
 	taken, err := s.repo.EmailTaken(ctx, req.Email, 0)
 	if err != nil {
 		s.publishError(ctx, types.ActionFailed, err)
@@ -140,7 +158,7 @@ func (s *service) Create(ctx context.Context, ownerUserID uint, req *CreateReque
 	}
 	user.Role = auth.Role{ID: roleID, Name: req.Role}
 
-	s.publishEvent(ctx, types.LevelInfo, types.ActionCreated, fmt.Sprint(user.ID), fmt.Sprint(ownerUserID), http.StatusCreated, map[string]any{
+	s.publishEvent(ctx, types.LevelInfo, types.ActionCreated, fmt.Sprint(user.ID), actorID, http.StatusCreated, map[string]any{
 		"username":  user.Username,
 		"email":     user.Email,
 		"role":      req.Role,

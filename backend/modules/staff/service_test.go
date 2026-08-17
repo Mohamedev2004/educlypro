@@ -181,6 +181,52 @@ func TestService_Create(t *testing.T) {
 	})
 }
 
+// ── CreateForCenter ───────────────────────────────────────────────────────────
+
+func TestService_CreateForCenter(t *testing.T) {
+	t.Run("Success_UsesGivenActorAsAuditActor", func(t *testing.T) {
+		pub := &mockPublisher{}
+		repo := &mockRepository{}
+		svc := &service{repo: repo, tokenRevoker: &mockTokenRevoker{}, publisher: pub}
+
+		resp, err := svc.CreateForCenter(context.Background(), ownerCenterID, 99, &CreateRequest{
+			Username: "jane", Email: "jane@example.com", Password: "secret12",
+			Role: RoleScanner, CenterID: ownerCenterID,
+		})
+		if err != nil {
+			t.Fatalf("expected no error, got %v", err)
+		}
+		if resp.CenterID != ownerCenterID {
+			t.Errorf("expected center id %d, got %d", ownerCenterID, resp.CenterID)
+		}
+
+		found := false
+		for _, topic := range pub.publishedTopics {
+			if topic == "system.events.v1.staff.created" {
+				found = true
+			}
+		}
+		if !found {
+			t.Errorf("expected 'system.events.v1.staff.created' event, got topics: %v", pub.publishedTopics)
+		}
+	})
+
+	t.Run("CenterMismatch_DoesNotResolveViaOwner", func(t *testing.T) {
+		// No findOwnerCenterIDFn set — CreateForCenter must never call it,
+		// since it trusts the given centerID directly.
+		repo := &mockRepository{}
+		svc := &service{repo: repo, tokenRevoker: &mockTokenRevoker{}, publisher: &mockPublisher{}}
+
+		_, err := svc.CreateForCenter(context.Background(), ownerCenterID, 99, &CreateRequest{
+			Username: "jane", Email: "jane@example.com", Password: "secret12",
+			Role: RoleScanner, CenterID: ownerCenterID + 1, // tampered
+		})
+		if err != ErrCenterMismatch {
+			t.Fatalf("expected ErrCenterMismatch, got %v", err)
+		}
+	})
+}
+
 // ── Update ────────────────────────────────────────────────────────────────────
 
 func TestService_Update(t *testing.T) {

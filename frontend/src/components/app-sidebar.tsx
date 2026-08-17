@@ -89,7 +89,9 @@ export function AppSidebar({ groups, ...props }: AppSidebarProps) {
                 </SidebarGroupLabel>
 
                 {group.items.map((item) => {
-                  const isActive = location.pathname === item.url
+                  const isActive =
+                    location.pathname === item.url ||
+                    location.pathname.startsWith(`${item.url}/`)
                   const showUnreadBadge =
                     item.url.endsWith("/notifications") && unreadCount > 0
 

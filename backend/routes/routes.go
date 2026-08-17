@@ -3,6 +3,7 @@ package routes
 import (
 	"educlypro/config"
 	"educlypro/modules/auth"
+	"educlypro/modules/centers"
 	"educlypro/modules/logs"
 	"educlypro/modules/notifications"
 	"educlypro/modules/notifications/delivery"
@@ -61,6 +62,12 @@ func Register(r *gin.Engine, db *gorm.DB, publisher message.Publisher) {
 	staffService := staff.NewService(staffRepo, auth.NewRepository(db), publisher)
 	staffHandler := staff.NewHandler(staffService)
 	staff.RegisterRoutes(v1, db, staffHandler)
+
+	// Centers Wiring (HTTP only) - super_admin managing all centers
+	centersRepo := centers.NewRepository(db)
+	centersService := centers.NewService(centersRepo, staffService)
+	centersHandler := centers.NewHandler(centersService)
+	centers.RegisterRoutes(v1, db, centersHandler)
 	// courses.RegisterCourseRoutes(v1, db, publisher)
 	// students.RegisterStudentRoutes(v1, db, publisher)
 	// parents.RegisterParentRoutes(v1, db, publisher)

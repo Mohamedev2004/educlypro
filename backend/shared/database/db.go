@@ -1,8 +1,8 @@
 package database
 
 import (
-	"educlypro/config"
 	"database/sql"
+	"educlypro/config"
 	"fmt"
 	"log"
 	"strings"
@@ -40,14 +40,19 @@ func connectOrInitDB(user, pass, host, port, dbname string) *gorm.DB {
 	dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=disable TimeZone=UTC",
 		host, user, pass, dbname, port)
 
-	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
+	// TranslateError surfaces portable sentinel errors (e.g. gorm.ErrDuplicatedKey)
+	// instead of raw driver errors, so callers can reliably detect things like
+	// unique constraint violations without parsing Postgres-specific error codes.
+	gormConfig := &gorm.Config{TranslateError: true}
+
+	db, err := gorm.Open(postgres.Open(dsn), gormConfig)
 
 	if err != nil {
 		// Postgres usually returns this exact error if the DB is missing
 		if strings.Contains(err.Error(), "does not exist") || strings.Contains(err.Error(), "SQLSTATE 3D000") {
 			createDatabase(user, pass, host, port, dbname)
 			// Try connecting again after creation
-			db, err = gorm.Open(postgres.Open(dsn), &gorm.Config{})
+			db, err = gorm.Open(postgres.Open(dsn), gormConfig)
 		}
 		if err != nil {
 			log.Fatalf("Failed to connect to PostgreSQL (%s): %v", dbname, err)
