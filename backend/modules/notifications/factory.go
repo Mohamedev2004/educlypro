@@ -21,8 +21,7 @@ var fakeChannels = []string{
 	"email",
 }
 
-func NewFakeNotification(userID uint) Notification {
-	isRead := gofakeit.Bool()
+func NewFakeNotification(userID uint, isRead bool) Notification {
 	createdAt := gofakeit.DateRange(time.Now().AddDate(0, 0, -30), time.Now())
 
 	payloadBytes, _ := json.Marshal(map[string]any{
@@ -50,15 +49,21 @@ func NewFakeNotification(userID uint) Notification {
 	return notification
 }
 
-func NewFakeNotifications(userIDs []uint, count int) []Notification {
-	if len(userIDs) == 0 || count <= 0 {
+// NewFakeNotificationsForUser generates exactly unreadCount unread and
+// readCount read notifications for a single user — a deterministic split,
+// not a random per-notification coin flip.
+func NewFakeNotificationsForUser(userID uint, unreadCount, readCount int) []Notification {
+	total := unreadCount + readCount
+	if total <= 0 {
 		return nil
 	}
 
-	notifications := make([]Notification, 0, count)
-	for i := 0; i < count; i++ {
-		userID := userIDs[i%len(userIDs)]
-		notifications = append(notifications, NewFakeNotification(userID))
+	notifications := make([]Notification, 0, total)
+	for i := 0; i < unreadCount; i++ {
+		notifications = append(notifications, NewFakeNotification(userID, false))
+	}
+	for i := 0; i < readCount; i++ {
+		notifications = append(notifications, NewFakeNotification(userID, true))
 	}
 
 	return notifications

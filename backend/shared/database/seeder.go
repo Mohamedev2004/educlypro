@@ -13,8 +13,8 @@ func SeedAll(db *gorm.DB) {
 		panic(err)
 	}
 
-	// Seed Notifications
-	if err := notifications.SeedNotifications(db, 20); err != nil {
+	// Seed Notifications (super_admin only)
+	if err := notifications.SeedNotifications(db); err != nil {
 		panic(err)
 	}
 }

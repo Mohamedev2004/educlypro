@@ -1,42 +1,65 @@
 package notifications
 
 import (
-	"educlypro/modules/auth"
-
 	"gorm.io/gorm"
 )
 
-func SeedNotifications(db *gorm.DB, count int) error {
-	var users []auth.User
-	if err := db.Select("id").Find(&users).Error; err != nil {
+type seedCount struct {
+	Unread int
+	Read   int
+}
+
+// notificationSeedCountsByRole mirrors the role restriction enforced on the
+// /notifications route group (see routes.go) — only these roles have an
+// inbox, so only these roles get seeded demo data, each with its own
+// unread/read split.
+var notificationSeedCountsByRole = map[string]seedCount{
+	"super_admin":  {Unread: 30, Read: 20},
+	"center_owner": {Unread: 15, Read: 15},
+}
+
+// SeedNotifications seeds demo data for the notifications inbox. Each user
+// in a notificationSeedCountsByRole role, without existing notifications,
+// gets exactly that role's unread + read count of fake notifications.
+func SeedNotifications(db *gorm.DB) error {
+	roles := make([]string, 0, len(notificationSeedCountsByRole))
+	for role := range notificationSeedCountsByRole {
+		roles = append(roles, role)
+	}
+
+	var rows []struct {
+		ID   uint
+		Role string
+	}
+	if err := db.
+		Table("users").
+		Joins("JOIN roles ON roles.id = users.role_id").
+		Where("roles.name IN ?", roles).
+		Select("users.id AS id, roles.name AS role").
+		Find(&rows).Error; err != nil {
 		return err
 	}
 
-	if len(users) == 0 {
-		return nil
-	}
-
-	userIDsNeedingSeed := make([]uint, 0, len(users))
-	for _, user := range users {
-		var existingForUser int64
+	for _, row := range rows {
+		var existing int64
 		if err := db.Model(&Notification{}).
-			Where("user_id = ?", user.ID).
-			Count(&existingForUser).Error; err != nil {
+			Where("user_id = ?", row.ID).
+			Count(&existing).Error; err != nil {
 			return err
 		}
-		if existingForUser == 0 {
-			userIDsNeedingSeed = append(userIDsNeedingSeed, user.ID)
+		if existing > 0 {
+			continue
+		}
+
+		counts := notificationSeedCountsByRole[row.Role]
+		fakeNotifications := NewFakeNotificationsForUser(row.ID, counts.Unread, counts.Read)
+		if len(fakeNotifications) == 0 {
+			continue
+		}
+		if err := db.Create(&fakeNotifications).Error; err != nil {
+			return err
 		}
 	}
 
-	if len(userIDsNeedingSeed) == 0 {
-		return nil
-	}
-
-	fakeNotifications := NewFakeNotifications(userIDsNeedingSeed, count)
-	if len(fakeNotifications) == 0 {
-		return nil
-	}
-
-	return db.Create(&fakeNotifications).Error
+	return nil
 }

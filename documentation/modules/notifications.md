@@ -6,7 +6,7 @@ Notifications are implemented as an **event-driven dispatch system** plus an **i
 
 - **Dispatching**: services publish `types.NotificationEvent` messages to Watermill.
 - **Delivery**: a subscriber receives events and fans out to one or more delivery channels.
-- **Inbox**: the backend exposes authenticated `/api/v1/notifications/*` endpoints for listing and managing in-app notifications persisted in the main DB.
+- **Inbox**: the backend exposes `/api/v1/notifications/*` endpoints, restricted to `super_admin` and `center_owner`, for listing and managing in-app notifications persisted in the main DB. No other role has a notifications inbox.
 
 Runtime wiring is split into:
 
@@ -102,7 +102,7 @@ Templates used by the mailer live under `backend/templates/emails/*`.
 
 ## In-app inbox API
 
-All endpoints are under `/api/v1` and require authentication (`AuthMiddleware`).
+All endpoints are under `/api/v1` and require `AuthMiddleware` + `RequireRole("super_admin", "center_owner")` — the whole `/notifications` route group is gated at once (`backend/modules/notifications/routes.go`), not per-route. Each user only ever sees their own notifications regardless of role (every handler scopes by the caller's own `userID`) — the role gate controls who has an inbox at all, not which rows within it.
 
 HTTP wiring lives in `backend/routes/routes.go`, which builds:
 
@@ -159,18 +159,32 @@ Persisted columns include:
 - `created_at`
 - `deleted_at` (soft delete)
 
-## Example: notifications emitted by auth
+## Seeding
 
-When a user registers, the auth service publishes:
+`notifications.SeedNotifications` (`backend/modules/notifications/seeder.go`)
+seeds demo inbox data for **`super_admin` and `center_owner` users only**
+(`notificationSeedCountsByRole`), matching the inbox's role restriction
+above. For each qualifying user that doesn't already have notifications, it
+creates a role-specific, deterministic split of fake notifications via
+`NewFakeNotificationsForUser` (not a random per-notification coin flip):
 
-- **Admin notification**:
-  - `topic = "user.registered"`
-  - `role_targets = ["admin"]`
-  - `channels = ["in_app","email"]`
-- **Welcome notification**:
-  - `topic = "user.welcome"`
-  - `recipient_ids = [<new_user_id>]`
-  - `channels = ["in_app","email"]`
+- `super_admin`: 30 unread + 20 read (50 total)
+- `center_owner`: 15 unread + 15 read (30 total)
+
+Called from `database.SeedAll`.
+
+## Current publishers
+
+No module currently publishes to `notifications.dispatch` — the dispatch
+architecture above (event → subscriber → in-app/email delivery) is wired up
+and ready, but nothing in `auth`, `staff`, or `centers` calls it today. The
+in-app inbox is populated by the seeder for demo purposes instead. If you
+wire up a real publisher, `role_targets` should use this app's actual role
+names (`super_admin`, `center_owner`, `center_scanner`,
+`center_receptionist`), and — since only `super_admin`/`center_owner` have
+an inbox — `role_targets` values of `center_scanner`/`center_receptionist`,
+or `recipient_ids` for users in those roles, would dispatch successfully but
+never be visible to anyone through the HTTP API.
 
 ## Watermill wiring (quick reference)
 

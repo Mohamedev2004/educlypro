@@ -76,6 +76,16 @@ export function App() {
             path="/center-owner/dashboard"
             element={<Dashboard dashboardHref="/center-owner/dashboard" />}
           />
+          <Route
+            path="/center-owner/notifications"
+            element={
+              <NotificationsPage
+                dashboardHref="/center-owner/dashboard"
+                breadcrumbTaglineKey="roles.overview"
+                breadcrumbLabelKey="roles.notifications"
+              />
+            }
+          />
           <Route path="/center-owner/staff" element={<CenterOwnerStaff />} />
 
           {/* Center Scanner */}

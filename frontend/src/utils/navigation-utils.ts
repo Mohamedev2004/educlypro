@@ -75,6 +75,11 @@ export function getRolePages(
             icon: ChartBar,
           },
           {
+            title: t("roles.notifications"),
+            url: "/center-owner/notifications",
+            icon: BellRing,
+          },
+          {
             title: t("roles.staff"),
             url: "/center-owner/staff",
             icon: UserKey,
