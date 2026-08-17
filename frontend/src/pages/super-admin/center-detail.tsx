@@ -1,6 +1,6 @@
 import { useState } from "react"
 import { Link, useParams } from "react-router-dom"
-import { ArrowLeft, University, Plus, UserPen, Users } from "lucide-react"
+import { ArrowLeft, University, Plus, UserPen, Users, ArrowRight } from "lucide-react"
 
 import AppLayout from "@/layouts/app-layout"
 import { useDirection } from "@/context/direction/direction-provider"
@@ -22,7 +22,7 @@ import { roleLabels } from "@/constants/roles"
  * Layer: Pages
  */
 export default function SuperAdminCenterDetail() {
-  const { t } = useDirection()
+  const { t, direction } = useDirection()
   const { slug } = useParams<{ slug: string }>()
   const centerSlug = slug ?? ""
 
@@ -52,7 +52,7 @@ export default function SuperAdminCenterDetail() {
       </AppLayout>
     )
   }
-
+  
   return (
     <AppLayout breadcrumbs={breadcrumbs}>
       <div className="flex h-full min-w-0 flex-1 flex-col gap-6">
@@ -61,7 +61,11 @@ export default function SuperAdminCenterDetail() {
           <div className="flex items-center gap-3">
             <Button variant="outline" size="icon" asChild>
               <Link to="/super-admin/centers">
-                <ArrowLeft className="h-4 w-4" />
+                {direction === "rtl" ? (
+                  <ArrowRight className="h-4 w-4" />
+                ) : (
+                  <ArrowLeft className="h-4 w-4" />
+                )}
                 <span className="sr-only">{t("centers.detail.back")}</span>
               </Link>
             </Button>
