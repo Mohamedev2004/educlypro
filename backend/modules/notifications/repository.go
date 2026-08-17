@@ -2,7 +2,6 @@ package notifications
 
 import (
 	"context"
-	"log"
 	"time"
 
 	"gorm.io/gorm"
@@ -18,7 +17,6 @@ type Repository interface {
 	UnreadCount(ctx context.Context, userID uint) (int64, error)
 	Delete(ctx context.Context, userID uint, id uint) error
 	DeleteAllRead(ctx context.Context, userID uint) error
-	DeleteOldReadNotifications() error
 }
 
 type repository struct {
@@ -136,21 +134,4 @@ func (r *repository) DeleteAllRead(ctx context.Context, userID uint) error {
 	return r.db.WithContext(ctx).
 		Where("user_id = ? AND is_read = ?", userID, true).
 		Delete(&Notification{}).Error
-}
-
-func (r *repository) DeleteOldReadNotifications() error {
-	cutoff := time.Now().AddDate(0, -1, 0)
-
-	result := r.db.
-		Where("is_read = ? AND created_at < ?", true, cutoff).
-		Delete(&Notification{})
-
-	if result.Error != nil {
-		return result.Error
-	}
-
-	log.Printf("Schedule [notification-cleanup] soft deleted %d read notifications older than %s",
-		result.RowsAffected, cutoff.Format(time.DateOnly))
-
-	return nil
 }

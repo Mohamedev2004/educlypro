@@ -3,23 +3,21 @@ package schedules
 import (
 	"log"
 	"time"
+
+	"educlypro/modules/auth"
+
+	"gorm.io/gorm"
 )
 
-// Run starts a background worker for a task
-func Run(name string, interval time.Duration, task func() error) {
-	go func() {
-		// Run once on startup
-		if err := task(); err != nil {
-			log.Printf("Schedule [%s] initial run error: %v", name, err)
+// StartTokenCleanup periodically deletes auth tokens whose expiry has passed.
+func StartTokenCleanup(db *gorm.DB) {
+	Run("Auth Token Cleanup", 12*time.Hour, func() error {
+		result := db.Where("expires_at < ?", time.Now()).Delete(&auth.Token{})
+		if result.Error != nil {
+			return result.Error
 		}
 
-		ticker := time.NewTicker(interval)
-		defer ticker.Stop()
-
-		for range ticker.C {
-			if err := task(); err != nil {
-				log.Printf("Schedule [%s] error: %v", name, err)
-			}
-		}
-	}()
+		log.Printf("Schedule [Auth Token Cleanup] deleted %d expired tokens", result.RowsAffected)
+		return nil
+	})
 }

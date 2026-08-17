@@ -104,7 +104,6 @@ func (m *mockRepository) FindByToken(tokenStr string) (*Token, error) {
 }
 func (m *mockRepository) UpdatePassword(userID uint, hashedPassword string) error        { return nil }
 func (m *mockRepository) UpdateProfile(userID uint, username string, email string) error { return nil }
-func (m *mockRepository) DeleteExpiredTokens() error                                     { return nil }
 
 // ── Fixtures & Helpers ────────────────────────────────────────────────────────
 

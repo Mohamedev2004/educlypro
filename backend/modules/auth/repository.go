@@ -2,7 +2,6 @@ package auth
 
 import (
 	"errors"
-	"log"
 	"time"
 
 	"gorm.io/gorm"
@@ -18,7 +17,6 @@ type Repository interface {
 	DeleteTokensByUserID(userID uint, tokenType string) error
 	DeleteToken(tokenStr string, tokenType string) error
 	FindByToken(tokenStr string) (*Token, error)
-	DeleteExpiredTokens() error
 }
 
 type repository struct {
@@ -97,10 +95,4 @@ func (r *repository) FindByToken(tokenStr string) (*Token, error) {
 		return nil, err
 	}
 	return &token, nil
-}
-
-func (r *repository) DeleteExpiredTokens() error {
-	result := r.db.Where("expires_at < ?", time.Now()).Delete(&Token{})
-	log.Printf("Maintenance: Deleted %d expired tokens", result.RowsAffected)
-	return result.Error
 }
