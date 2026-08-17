@@ -1,6 +1,6 @@
 import { useState } from "react"
 import { Link, useParams } from "react-router-dom"
-import { ArrowLeft, Building2, Plus, UserPen, Users as UsersIcon } from "lucide-react"
+import { ArrowLeft, University, Plus, UserPen, Users } from "lucide-react"
 
 import AppLayout from "@/layouts/app-layout"
 import { useDirection } from "@/context/direction/direction-provider"
@@ -79,7 +79,7 @@ export default function SuperAdminCenterDetail() {
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
-                  <Building2 className="h-4 w-4" />
+                  <University className="h-4 w-4" />
                   {t("centers.detail.centerInfo")}
                 </CardTitle>
               </CardHeader>
@@ -96,7 +96,7 @@ export default function SuperAdminCenterDetail() {
             <Card>
               <CardHeader className="flex flex-row items-center justify-between">
                 <CardTitle className="flex items-center gap-2">
-                  <UsersIcon className="h-4 w-4" />
+                  <Users className="h-4 w-4" />
                   {t("centers.detail.staffList")}
                 </CardTitle>
                 <Button size="sm" variant="outline" onClick={() => setStaffDialogOpen(true)}>
