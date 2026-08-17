@@ -50,8 +50,8 @@ export default function SuperAdminCenters() {
     >
       <div className="flex flex-1 flex-col gap-4">
         <div>
-          <h1 className="text-lg font-semibold">{t("centers.title")}</h1>
-          <p className="text-sm text-muted-foreground">{t("centers.description")}</p>
+          <h1 className="text-2xl font-semibold text-foreground">{t("centers.title")}</h1>
+          <p className="text-sm text-muted-foreground max-w-3xl text-justify">{t("centers.description")}</p>
         </div>
 
         <DataTable
