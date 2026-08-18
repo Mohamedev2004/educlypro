@@ -1,0 +1,48 @@
+export const subcenters = {
+  title: "Sub-centers",
+  description: "Manage the operational locations within your center.",
+  empty: "No sub-centers found.",
+  loading: "Loading...",
+  addButton: "Add sub-center",
+  columns: {
+    name: "Name",
+    staffCount: "Staff",
+    createdAt: "Created",
+    openMenu: "Open menu",
+    actions: "Actions",
+  },
+  dialog: {
+    addTitle: "Add sub-center",
+    addDescription: "Create a new operational location within your center.",
+    editTitle: "Edit sub-center",
+    editDescription: "Rename this sub-center.",
+    submitAdd: "Create sub-center",
+    submitEdit: "Save changes",
+  },
+  fields: {
+    name: "Name",
+  },
+  deleteDialog: {
+    title: "Delete sub-center",
+    description:
+      "Are you sure you want to delete {name}? This cannot be undone.",
+  },
+  createSuccess: "Sub-center created.",
+  createSuccessDescription: "It's now available when assigning staff.",
+  updateSuccess: "Sub-center updated.",
+  updateSuccessDescription: "The changes have been saved.",
+  deleteSuccess: "Sub-center deleted.",
+  deleteSuccessDescription: "It's no longer available for staff assignment.",
+  errors: {
+    notFound: "Sub-center not found.",
+    exists: "A sub-center with this name already exists.",
+    hasStaff: "Reassign or remove its staff before deleting this sub-center.",
+    mismatch: "This sub-center does not belong to this center.",
+    loadFailed: "Failed to load sub-centers. Please try again.",
+    createFailed: "Failed to create sub-center. Please try again.",
+    updateFailed: "Failed to update sub-center. Please try again.",
+    deleteFailed: "Failed to delete sub-center. Please try again.",
+    nameRequired: "Name is required.",
+    nameMin: "Name must be at least 2 characters.",
+  },
+}

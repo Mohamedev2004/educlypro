@@ -8,6 +8,7 @@ export const staff = {
     username: "Username",
     email: "Email",
     role: "Role",
+    subCenter: "Sub-center",
     createdAt: "Created",
     openMenu: "Open menu",
     actions: "Actions",
@@ -30,12 +31,15 @@ export const staff = {
     username: "Username",
     email: "Email",
     role: "Role",
+    subCenter: "Sub-center",
+    subCenterPlaceholder: "Select a sub-center...",
     password: "Password",
     passwordEditHint: "(leave blank to keep current)",
   },
   deleteDialog: {
     title: "Delete staff member",
-    description: "Are you sure you want to delete {name}? This cannot be undone.",
+    description:
+      "Are you sure you want to delete {name}? This cannot be undone.",
   },
   createSuccess: "Staff member created.",
   createSuccessDescription: "The new staff member can now sign in.",
@@ -58,5 +62,6 @@ export const staff = {
     passwordRequired: "Password is required.",
     passwordMin: "Password must be at least 6 characters.",
     roleInvalid: "Please select a valid role.",
+    subCenterRequired: "Please select a sub-center.",
   },
 }

@@ -9,7 +9,11 @@ import (
 
 func RegisterRoutes(rg *gin.RouterGroup, mainDB *gorm.DB, h *Handler) {
 	staff := rg.Group("/staff")
-	staff.Use(middleware.AuthMiddleware(mainDB), middleware.RequireRole("center_owner"))
+	staff.Use(
+		middleware.AuthMiddleware(mainDB),
+		middleware.RequireRole("center_owner"),
+		middleware.RequireAcademicSetup(mainDB),
+	)
 	{
 		staff.GET("", h.List)
 		staff.POST("", h.Create)

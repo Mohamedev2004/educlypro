@@ -24,14 +24,30 @@ const NotificationsPage = lazy(() => import("./pages/notifications"))
 // Super Admin
 const SuperAdminLogs = lazy(() => import("./pages/super-admin/logs"))
 const SuperAdminCenters = lazy(() => import("./pages/super-admin/centers"))
-const SuperAdminCenterDetail = lazy(() => import("./pages/super-admin/center-detail"))
+const SuperAdminCenterDetail = lazy(
+  () => import("./pages/super-admin/center-detail")
+)
 
 // Center Owner
+const CenterOwnerOnboarding = lazy(
+  () => import("./pages/center-owner/onboarding")
+)
 const CenterOwnerStaff = lazy(() => import("./pages/center-owner/staff"))
+const CenterOwnerSubCenters = lazy(
+  () => import("./pages/center-owner/subcenters")
+)
+const CenterOwnerTeachers = lazy(() => import("./pages/center-owner/teachers"))
+const CenterOwnerTeacherDetail = lazy(
+  () => import("./pages/center-owner/teacher-detail")
+)
 
 // Center Scanner
-const CenterScannerScanner = lazy(() => import("./pages/center-scanner/scanner"))
-const CenterScannerStudents = lazy(() => import("./pages/center-scanner/students"))
+const CenterScannerScanner = lazy(
+  () => import("./pages/center-scanner/scanner")
+)
+const CenterScannerStudents = lazy(
+  () => import("./pages/center-scanner/students")
+)
 
 export function App() {
   return (
@@ -69,9 +85,16 @@ export function App() {
           />
           <Route path="/super-admin/logs" element={<SuperAdminLogs />} />
           <Route path="/super-admin/centers" element={<SuperAdminCenters />} />
-          <Route path="/super-admin/centers/:slug" element={<SuperAdminCenterDetail />} />
+          <Route
+            path="/super-admin/centers/:slug"
+            element={<SuperAdminCenterDetail />}
+          />
 
           {/* Center Owner */}
+          <Route
+            path="/center-owner/onboarding"
+            element={<CenterOwnerOnboarding />}
+          />
           <Route
             path="/center-owner/dashboard"
             element={<Dashboard dashboardHref="/center-owner/dashboard" />}
@@ -87,15 +110,35 @@ export function App() {
             }
           />
           <Route path="/center-owner/staff" element={<CenterOwnerStaff />} />
+          <Route
+            path="/center-owner/subcenters"
+            element={<CenterOwnerSubCenters />}
+          />
+          <Route
+            path="/center-owner/teachers"
+            element={<CenterOwnerTeachers />}
+          />
+          <Route
+            path="/center-owner/teachers/:slug"
+            element={<CenterOwnerTeacherDetail />}
+          />
 
           {/* Center Scanner */}
-          <Route path="/center-scanner/scanner" element={<CenterScannerScanner />} />
-          <Route path="/center-scanner/students" element={<CenterScannerStudents />} />
+          <Route
+            path="/center-scanner/scanner"
+            element={<CenterScannerScanner />}
+          />
+          <Route
+            path="/center-scanner/students"
+            element={<CenterScannerStudents />}
+          />
 
           {/* Center Receptionist */}
           <Route
             path="/center-receptionist/dashboard"
-            element={<Dashboard dashboardHref="/center-receptionist/dashboard" />}
+            element={
+              <Dashboard dashboardHref="/center-receptionist/dashboard" />
+            }
           />
         </Route>
 

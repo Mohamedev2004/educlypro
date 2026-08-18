@@ -1,5 +1,6 @@
 import type { ApiEnvelope } from "./notification.types"
 import type { Staff, StaffRole } from "./staff.types"
+import type { SubCentersListEnvelope } from "./subcenters.types"
 
 /**
  * Centers (super admin overview) API types.
@@ -83,6 +84,7 @@ export type AddStaffPayload = {
   email: string
   password: string
   role: StaffRole
+  sub_center_id: number
 }
 
 export type CentersListEnvelope = ApiEnvelope<CentersListData>
@@ -90,3 +92,4 @@ export type CenterEnvelope = ApiEnvelope<Center>
 export type CenterDetailEnvelope = ApiEnvelope<CenterDetail>
 export type CenterOwnerEnvelope = ApiEnvelope<CenterOwner>
 export type AddStaffEnvelope = ApiEnvelope<Staff>
+export type CenterSubCentersEnvelope = SubCentersListEnvelope

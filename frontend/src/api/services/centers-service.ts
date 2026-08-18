@@ -1,5 +1,6 @@
 import { axiosInstance } from "../axios"
 import type { Staff } from "../types/staff.types"
+import type { SubCentersListData } from "../types/subcenters.types"
 import type {
   AddOwnerPayload,
   AddStaffEnvelope,
@@ -10,6 +11,7 @@ import type {
   CenterEnvelope,
   CenterOwner,
   CenterOwnerEnvelope,
+  CenterSubCentersEnvelope,
   CentersListData,
   CentersListEnvelope,
   CentersListParams,
@@ -31,7 +33,10 @@ export const CentersService = {
   },
 
   async create(payload: CreateCenterPayload): Promise<Center> {
-    const response = await axiosInstance.post<CenterEnvelope>("/centers", payload)
+    const response = await axiosInstance.post<CenterEnvelope>(
+      "/centers",
+      payload
+    )
     return response.data.data
   },
 
@@ -54,6 +59,13 @@ export const CentersService = {
     const response = await axiosInstance.post<AddStaffEnvelope>(
       `/centers/${encodeURIComponent(slug)}/staff`,
       payload
+    )
+    return response.data.data
+  },
+
+  async listSubCenters(slug: string): Promise<SubCentersListData> {
+    const response = await axiosInstance.get<CenterSubCentersEnvelope>(
+      `/centers/${encodeURIComponent(slug)}/subcenters`
     )
     return response.data.data
   },

@@ -195,6 +195,24 @@
   }
 }
 
+/* Accordion expand/collapse (driven by Radix's --radix-accordion-content-height) */
+@keyframes accordion-down {
+  from {
+    height: 0;
+  }
+  to {
+    height: var(--radix-accordion-content-height);
+  }
+}
+@keyframes accordion-up {
+  from {
+    height: var(--radix-accordion-content-height);
+  }
+  to {
+    height: 0;
+  }
+}
+
 .hide-scrollbar {
   -ms-overflow-style: none;  /* IE and old Edge */
   scrollbar-width: none;     /* Firefox */

@@ -153,3 +153,20 @@ func (h *Handler) AddStaff(c *gin.Context) {
 
 	utils.SuccessResponse(c, http.StatusCreated, "staff added", resp)
 }
+
+// GET /centers/:slug/subcenters
+func (h *Handler) ListSubCenters(c *gin.Context) {
+	slug := c.Param("slug")
+
+	resp, err := h.service.ListSubCenters(c.Request.Context(), slug)
+	if err != nil {
+		if errors.Is(err, ErrCenterNotFound) {
+			utils.ErrorResponseWithCode(c, http.StatusNotFound, "center_not_found", "Center not found.")
+			return
+		}
+		utils.ErrorResponseWithCode(c, http.StatusInternalServerError, "centers_list_subcenters_failed", "Failed to load sub-centers. Please try again.")
+		return
+	}
+
+	utils.SuccessResponse(c, http.StatusOK, "sub-centers retrieved", resp)
+}

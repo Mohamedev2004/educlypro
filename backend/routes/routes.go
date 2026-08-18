@@ -2,12 +2,15 @@ package routes
 
 import (
 	"educlypro/config"
+	"educlypro/modules/academic"
 	"educlypro/modules/auth"
 	"educlypro/modules/centers"
 	"educlypro/modules/logs"
 	"educlypro/modules/notifications"
 	"educlypro/modules/notifications/delivery"
 	"educlypro/modules/staff"
+	"educlypro/modules/subcenters"
+	"educlypro/modules/teachers"
 	"educlypro/shared/database"
 	"educlypro/shared/middleware"
 
@@ -63,11 +66,34 @@ func Register(r *gin.Engine, db *gorm.DB, publisher message.Publisher) {
 	staffHandler := staff.NewHandler(staffService)
 	staff.RegisterRoutes(v1, db, staffHandler)
 
+	// Sub-centers Wiring (HTTP only) - center_owner managing their own
+	// center's sub-centers; also consumed by the centers module below so a
+	// super_admin can populate a sub-center picker for an arbitrary center.
+	subCentersRepo := subcenters.NewRepository(db)
+	subCentersService := subcenters.NewService(subCentersRepo)
+	subCentersHandler := subcenters.NewHandler(subCentersService)
+	subcenters.RegisterRoutes(v1, db, subCentersHandler)
+
 	// Centers Wiring (HTTP only) - super_admin managing all centers
 	centersRepo := centers.NewRepository(db)
-	centersService := centers.NewService(centersRepo, staffService)
+	centersService := centers.NewService(centersRepo, staffService, subCentersService)
 	centersHandler := centers.NewHandler(centersService)
 	centers.RegisterRoutes(v1, db, centersHandler)
+
+	// Academic Wiring (HTTP only) - center_owner managing their own center's
+	// grade/major/subject structure.
+	academicRepo := academic.NewRepository(db)
+	academicService := academic.NewService(academicRepo)
+	academicHandler := academic.NewHandler(academicService)
+	academic.RegisterRoutes(v1, db, academicHandler)
+
+	// Teachers Wiring (HTTP only) - center_owner managing their own center's
+	// teachers (not auth.User accounts — plain records, many-to-many with
+	// academic.Subject).
+	teachersRepo := teachers.NewRepository(db)
+	teachersService := teachers.NewService(teachersRepo)
+	teachersHandler := teachers.NewHandler(teachersService)
+	teachers.RegisterRoutes(v1, db, teachersHandler)
 	// courses.RegisterCourseRoutes(v1, db, publisher)
 	// students.RegisterStudentRoutes(v1, db, publisher)
 	// parents.RegisterParentRoutes(v1, db, publisher)

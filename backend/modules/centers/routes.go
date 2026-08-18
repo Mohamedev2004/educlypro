@@ -14,6 +14,7 @@ func RegisterRoutes(rg *gin.RouterGroup, mainDB *gorm.DB, h *Handler) {
 		centers.GET("", h.List)
 		centers.POST("", h.Create)
 		centers.GET("/:slug", h.GetBySlug)
+		centers.GET("/:slug/subcenters", h.ListSubCenters)
 		centers.POST("/:slug/owner", h.AddOwner)
 		centers.POST("/:slug/staff", h.AddStaff)
 	}

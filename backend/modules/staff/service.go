@@ -19,9 +19,11 @@ import (
 )
 
 var (
-	ErrCenterMismatch = errors.New("center mismatch")
-	ErrEmailTaken     = errors.New("email already in use")
-	ErrStaffNotFound  = errors.New("staff not found")
+	ErrCenterMismatch    = errors.New("center mismatch")
+	ErrEmailTaken        = errors.New("email already in use")
+	ErrStaffNotFound     = errors.New("staff not found")
+	ErrSubCenterNotFound = errors.New("sub-center not found")
+	ErrSubCenterMismatch = errors.New("sub-center does not belong to this center")
 )
 
 // TokenRevoker is the minimal capability the staff service needs from the
@@ -124,6 +126,11 @@ func (s *service) CreateForCenter(ctx context.Context, centerID, actorUserID uin
 }
 
 func (s *service) createStaffMember(ctx context.Context, centerID uint, actorID string, req *CreateRequest) (*Response, error) {
+	subCenter, err := s.resolveSubCenter(ctx, centerID, req.SubCenterID)
+	if err != nil {
+		return nil, err
+	}
+
 	taken, err := s.repo.EmailTaken(ctx, req.Email, 0)
 	if err != nil {
 		s.publishError(ctx, types.ActionFailed, err)
@@ -146,27 +153,48 @@ func (s *service) createStaffMember(ctx context.Context, centerID uint, actorID 
 	}
 
 	user := &auth.User{
-		Username: req.Username,
-		Email:    req.Email,
-		Password: hashed,
-		RoleID:   roleID,
-		CenterID: &centerID,
+		Username:    req.Username,
+		Email:       req.Email,
+		Password:    hashed,
+		RoleID:      roleID,
+		CenterID:    &centerID,
+		SubCenterID: &subCenter.ID,
 	}
 	if err := s.repo.Create(ctx, user); err != nil {
 		s.publishError(ctx, types.ActionFailed, err)
 		return nil, err
 	}
 	user.Role = auth.Role{ID: roleID, Name: req.Role}
+	user.SubCenter = subCenter
 
 	s.publishEvent(ctx, types.LevelInfo, types.ActionCreated, fmt.Sprint(user.ID), actorID, http.StatusCreated, map[string]any{
-		"username":  user.Username,
-		"email":     user.Email,
-		"role":      req.Role,
-		"center_id": centerID,
+		"username":      user.Username,
+		"email":         user.Email,
+		"role":          req.Role,
+		"center_id":     centerID,
+		"sub_center_id": subCenter.ID,
 	}, "system.events.v1.staff.created")
 
 	resp := toResponse(*user)
 	return &resp, nil
+}
+
+// resolveSubCenter validates that subCenterID names an existing sub-center
+// belonging to centerID — the same "trust the DB, not the request" pattern
+// as the centerID check in Create/Update.
+func (s *service) resolveSubCenter(ctx context.Context, centerID, subCenterID uint) (*auth.SubCenter, error) {
+	subCenter, err := s.repo.FindSubCenter(ctx, subCenterID)
+	if err != nil {
+		s.publishError(ctx, types.ActionFailed, err)
+		return nil, err
+	}
+	if subCenter == nil {
+		return nil, ErrSubCenterNotFound
+	}
+	if subCenter.CenterID != centerID {
+		return nil, ErrSubCenterMismatch
+	}
+	return subCenter, nil
 }
 
 func (s *service) Update(ctx context.Context, ownerUserID, staffID uint, req *UpdateRequest) (*Response, error) {
@@ -186,6 +214,11 @@ func (s *service) Update(ctx context.Context, ownerUserID, staffID uint, req *Up
 	}
 	if existing == nil {
 		return nil, ErrStaffNotFound
+	}
+
+	subCenter, err := s.resolveSubCenter(ctx, centerID, req.SubCenterID)
+	if err != nil {
+		return nil, err
 	}
 
 	if req.Email != existing.Email {
@@ -216,11 +249,12 @@ func (s *service) Update(ctx context.Context, ownerUserID, staffID uint, req *Up
 	}
 
 	updated := &auth.User{
-		ID:       staffID,
-		Username: req.Username,
-		Email:    req.Email,
-		Password: password,
-		RoleID:   roleID,
+		ID:          staffID,
+		Username:    req.Username,
+		Email:       req.Email,
+		Password:    password,
+		RoleID:      roleID,
+		SubCenterID: &subCenter.ID,
 	}
 	if err := s.repo.Update(ctx, updated); err != nil {
 		s.publishError(ctx, types.ActionFailed, err)
@@ -229,11 +263,13 @@ func (s *service) Update(ctx context.Context, ownerUserID, staffID uint, req *Up
 	updated.CenterID = &centerID
 	updated.CreatedAt = existing.CreatedAt
 	updated.Role = auth.Role{ID: roleID, Name: req.Role}
+	updated.SubCenter = subCenter
 
 	s.publishEvent(ctx, types.LevelInfo, types.ActionUpdated, fmt.Sprint(staffID), fmt.Sprint(ownerUserID), http.StatusOK, map[string]any{
-		"username": req.Username,
-		"email":    req.Email,
-		"role":     req.Role,
+		"username":      req.Username,
+		"email":         req.Email,
+		"role":          req.Role,
+		"sub_center_id": subCenter.ID,
 	}, "system.events.v1.staff.updated")
 
 	resp := toResponse(*updated)
@@ -282,7 +318,8 @@ func toResponse(u auth.User) Response {
 	if u.CenterID != nil {
 		centerID = *u.CenterID
 	}
-	return Response{
+
+	resp := Response{
 		ID:        u.ID,
 		Username:  u.Username,
 		Email:     u.Email,
@@ -290,6 +327,15 @@ func toResponse(u auth.User) Response {
 		CenterID:  centerID,
 		CreatedAt: u.CreatedAt.Format(time.RFC3339),
 	}
+
+	if u.SubCenterID != nil {
+		resp.SubCenterID = *u.SubCenterID
+	}
+	if u.SubCenter != nil {
+		resp.SubCenterName = u.SubCenter.Name
+	}
+
+	return resp
 }
 
 // ==========================================

@@ -1,0 +1,48 @@
+export const subcenters = {
+  title: "المراكز الفرعية",
+  description: "إدارة المواقع التشغيلية داخل مركزك.",
+  empty: "لا توجد مراكز فرعية.",
+  loading: "جارٍ التحميل...",
+  addButton: "إضافة مركز فرعي",
+  columns: {
+    name: "الاسم",
+    staffCount: "الموظفون",
+    createdAt: "تاريخ الإنشاء",
+    openMenu: "فتح القائمة",
+    actions: "إجراءات",
+  },
+  dialog: {
+    addTitle: "إضافة مركز فرعي",
+    addDescription: "إنشاء موقع تشغيلي جديد داخل مركزك.",
+    editTitle: "تعديل المركز الفرعي",
+    editDescription: "إعادة تسمية هذا المركز الفرعي.",
+    submitAdd: "إنشاء المركز الفرعي",
+    submitEdit: "حفظ التغييرات",
+  },
+  fields: {
+    name: "الاسم",
+  },
+  deleteDialog: {
+    title: "حذف المركز الفرعي",
+    description:
+      "هل أنت متأكد أنك تريد حذف {name}؟ لا يمكن التراجع عن هذا الإجراء.",
+  },
+  createSuccess: "تم إنشاء المركز الفرعي.",
+  createSuccessDescription: "أصبح متاحًا الآن عند تعيين الموظفين.",
+  updateSuccess: "تم تحديث المركز الفرعي.",
+  updateSuccessDescription: "تم حفظ التغييرات.",
+  deleteSuccess: "تم حذف المركز الفرعي.",
+  deleteSuccessDescription: "لم يعد متاحًا لتعيين الموظفين.",
+  errors: {
+    notFound: "المركز الفرعي غير موجود.",
+    exists: "يوجد مركز فرعي بهذا الاسم بالفعل.",
+    hasStaff: "أعد تعيين موظفيه أو أزلهم قبل حذف هذا المركز الفرعي.",
+    mismatch: "هذا المركز الفرعي لا ينتمي إلى هذا المركز.",
+    loadFailed: "تعذر تحميل المراكز الفرعية. حاول مرة أخرى.",
+    createFailed: "تعذر إنشاء المركز الفرعي. حاول مرة أخرى.",
+    updateFailed: "تعذر تحديث المركز الفرعي. حاول مرة أخرى.",
+    deleteFailed: "تعذر حذف المركز الفرعي. حاول مرة أخرى.",
+    nameRequired: "الاسم مطلوب.",
+    nameMin: "يجب أن يتكون الاسم من حرفين على الأقل.",
+  },
+}

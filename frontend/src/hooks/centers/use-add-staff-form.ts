@@ -24,11 +24,13 @@ export function useAddStaffForm(
   const [email, setEmail] = useState("")
   const [role, setRole] = useState<StaffRole>("center_scanner")
   const [password, setPassword] = useState("")
+  const [subCenterId, setSubCenterId] = useState(0)
   const [errors, setErrors] = useState<{
     username?: string
     email?: string
     role?: string
     password?: string
+    subCenterId?: string
     general?: string
   }>({})
 
@@ -38,12 +40,24 @@ export function useAddStaffForm(
   const handleSubmit = async () => {
     setErrors({})
 
+    if (!subCenterId) {
+      setErrors({ subCenterId: t("staff.errors.subCenterRequired") })
+      return false
+    }
+
     try {
-      await addStaff.mutateAsync({ username, email, password, role })
+      await addStaff.mutateAsync({
+        username,
+        email,
+        password,
+        role,
+        sub_center_id: subCenterId,
+      })
       setUsername("")
       setEmail("")
       setRole("center_scanner")
       setPassword("")
+      setSubCenterId(0)
       onSuccess()
       return true
     } catch (err) {
@@ -57,8 +71,12 @@ export function useAddStaffForm(
         username: usernameError
           ? getCentersFieldMessage(t, "username", usernameError)
           : undefined,
-        email: emailError ? getCentersFieldMessage(t, "email", emailError) : undefined,
-        role: roleError ? getCentersFieldMessage(t, "role", roleError) : undefined,
+        email: emailError
+          ? getCentersFieldMessage(t, "email", emailError)
+          : undefined,
+        role: roleError
+          ? getCentersFieldMessage(t, "role", roleError)
+          : undefined,
         password: passwordError
           ? getCentersFieldMessage(t, "password", passwordError)
           : undefined,
@@ -80,6 +98,8 @@ export function useAddStaffForm(
     setRole,
     password,
     setPassword,
+    subCenterId,
+    setSubCenterId,
     errors,
     isSubmitting,
     handleSubmit,

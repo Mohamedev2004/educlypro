@@ -2,8 +2,13 @@ import { useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { toast } from "sonner"
 import { useAuth } from "@/context/auth/auth-context"
-import { normalizeApiError, getFieldError, getApiMessage, getAuthFieldMessage } from "@/utils/error-utils"
-import { getDashboardPath } from "@/utils/navigation-utils"
+import {
+  normalizeApiError,
+  getFieldError,
+  getApiMessage,
+  getAuthFieldMessage,
+} from "@/utils/error-utils"
+import { getPostLoginPath } from "@/utils/navigation-utils"
 import type { LoginPayload } from "@/api/types/auth.types"
 
 export function useLogin(t: (key: string) => string) {
@@ -29,7 +34,7 @@ export function useLogin(t: (key: string) => string) {
           onClick: () => toast.dismiss(toastId),
         },
       })
-      navigate(getDashboardPath(user.role), { replace: true })
+      navigate(getPostLoginPath(user), { replace: true })
     } catch (err) {
       const apiError = normalizeApiError(err)
       const emailError = getFieldError(apiError, "email")

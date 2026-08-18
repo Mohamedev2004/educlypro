@@ -39,6 +39,7 @@ type mockRepository struct {
 	countByCenterFn     func(ctx context.Context, centerID uint, role, search string) (int64, error)
 	findByIDInCenterFn  func(ctx context.Context, centerID, staffID uint) (*auth.User, error)
 	findRoleIDByNameFn  func(ctx context.Context, name string) (uint, error)
+	findSubCenterFn     func(ctx context.Context, subCenterID uint) (*auth.SubCenter, error)
 	createFn            func(ctx context.Context, user *auth.User) error
 	updateFn            func(ctx context.Context, user *auth.User) error
 	softDeleteFn        func(ctx context.Context, staffID uint) error
@@ -71,6 +72,12 @@ func (m *mockRepository) FindRoleIDByName(ctx context.Context, name string) (uin
 		return m.findRoleIDByNameFn(ctx, name)
 	}
 	return 2, nil
+}
+func (m *mockRepository) FindSubCenter(ctx context.Context, subCenterID uint) (*auth.SubCenter, error) {
+	if m.findSubCenterFn != nil {
+		return m.findSubCenterFn(ctx, subCenterID)
+	}
+	return &auth.SubCenter{ID: subCenterID, CenterID: ownerCenterID}, nil
 }
 func (m *mockRepository) Create(ctx context.Context, user *auth.User) error {
 	if m.createFn != nil {
@@ -177,6 +184,38 @@ func TestService_Create(t *testing.T) {
 		})
 		if err != ErrEmailTaken {
 			t.Fatalf("expected ErrEmailTaken, got %v", err)
+		}
+	})
+
+	t.Run("SubCenterNotFound", func(t *testing.T) {
+		repo := newRepoForOwner()
+		repo.findSubCenterFn = func(ctx context.Context, subCenterID uint) (*auth.SubCenter, error) {
+			return nil, nil
+		}
+		svc := &service{repo: repo, tokenRevoker: &mockTokenRevoker{}, publisher: &mockPublisher{}}
+
+		_, err := svc.Create(context.Background(), 1, &CreateRequest{
+			Username: "jane", Email: "jane@example.com", Password: "secret12",
+			Role: RoleScanner, CenterID: ownerCenterID, SubCenterID: 999,
+		})
+		if err != ErrSubCenterNotFound {
+			t.Fatalf("expected ErrSubCenterNotFound, got %v", err)
+		}
+	})
+
+	t.Run("SubCenterMismatch", func(t *testing.T) {
+		repo := newRepoForOwner()
+		repo.findSubCenterFn = func(ctx context.Context, subCenterID uint) (*auth.SubCenter, error) {
+			return &auth.SubCenter{ID: subCenterID, CenterID: ownerCenterID + 1}, nil // belongs to another center
+		}
+		svc := &service{repo: repo, tokenRevoker: &mockTokenRevoker{}, publisher: &mockPublisher{}}
+
+		_, err := svc.Create(context.Background(), 1, &CreateRequest{
+			Username: "jane", Email: "jane@example.com", Password: "secret12",
+			Role: RoleScanner, CenterID: ownerCenterID, SubCenterID: 3,
+		})
+		if err != ErrSubCenterMismatch {
+			t.Fatalf("expected ErrSubCenterMismatch, got %v", err)
 		}
 	})
 }

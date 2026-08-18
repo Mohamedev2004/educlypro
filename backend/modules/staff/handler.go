@@ -86,6 +86,10 @@ func (h *Handler) Create(c *gin.Context) {
 		switch {
 		case errors.Is(err, ErrCenterMismatch):
 			utils.ErrorResponseWithCode(c, http.StatusForbidden, "center_mismatch", "You can only add staff to your own center.")
+		case errors.Is(err, ErrSubCenterNotFound):
+			utils.ErrorResponseWithCode(c, http.StatusNotFound, "subcenter_not_found", "Sub-center not found.")
+		case errors.Is(err, ErrSubCenterMismatch):
+			utils.ErrorResponseWithCode(c, http.StatusForbidden, "subcenter_mismatch", "This sub-center does not belong to this center.")
 		case errors.Is(err, ErrEmailTaken):
 			utils.ValidationErrorResponse(c, http.StatusConflict, "email_taken", "Email is already in use.", map[string]string{"email": "validation.taken"})
 		default:
@@ -120,6 +124,10 @@ func (h *Handler) Update(c *gin.Context) {
 			utils.ErrorResponseWithCode(c, http.StatusForbidden, "center_mismatch", "You can only manage staff in your own center.")
 		case errors.Is(err, ErrStaffNotFound):
 			utils.ErrorResponseWithCode(c, http.StatusNotFound, "staff_not_found", "Staff member not found.")
+		case errors.Is(err, ErrSubCenterNotFound):
+			utils.ErrorResponseWithCode(c, http.StatusNotFound, "subcenter_not_found", "Sub-center not found.")
+		case errors.Is(err, ErrSubCenterMismatch):
+			utils.ErrorResponseWithCode(c, http.StatusForbidden, "subcenter_mismatch", "This sub-center does not belong to this center.")
 		case errors.Is(err, ErrEmailTaken):
 			utils.ValidationErrorResponse(c, http.StatusConflict, "email_taken", "Email is already in use.", map[string]string{"email": "validation.taken"})
 		default:

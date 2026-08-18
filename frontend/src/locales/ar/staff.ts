@@ -8,6 +8,7 @@ export const staff = {
     username: "اسم المستخدم",
     email: "البريد الإلكتروني",
     role: "الدور",
+    subCenter: "المركز الفرعي",
     createdAt: "تاريخ الإنشاء",
     openMenu: "فتح القائمة",
     actions: "الإجراءات",
@@ -30,12 +31,15 @@ export const staff = {
     username: "اسم المستخدم",
     email: "البريد الإلكتروني",
     role: "الدور",
+    subCenter: "المركز الفرعي",
+    subCenterPlaceholder: "اختر مركزًا فرعيًا...",
     password: "كلمة المرور",
     passwordEditHint: "(اتركه فارغًا للاحتفاظ بالحالي)",
   },
   deleteDialog: {
     title: "حذف الموظف",
-    description: "هل أنت متأكد أنك تريد حذف {name}؟ لا يمكن التراجع عن هذا الإجراء.",
+    description:
+      "هل أنت متأكد أنك تريد حذف {name}؟ لا يمكن التراجع عن هذا الإجراء.",
   },
   createSuccess: "تم إنشاء الموظف.",
   createSuccessDescription: "يمكن للموظف الجديد تسجيل الدخول الآن.",
@@ -58,5 +62,6 @@ export const staff = {
     passwordRequired: "كلمة المرور مطلوبة.",
     passwordMin: "يجب أن تتكون كلمة المرور من 6 أحرف على الأقل.",
     roleInvalid: "يرجى اختيار دور صالح.",
+    subCenterRequired: "يرجى اختيار مركز فرعي.",
   },
 }

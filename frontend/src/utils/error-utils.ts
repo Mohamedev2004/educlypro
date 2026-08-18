@@ -1,6 +1,6 @@
 /**
  * Pure helper functions for handling and translating API errors.
- * 
+ *
  * Responsibility: Normalize API errors and provide translated messages.
  * Layer: Utils
  */
@@ -121,6 +121,37 @@ export function getApiMessage(t: Translate, error: ApiError) {
     centers_get_failed: "centers.errors.loadFailed",
     centers_add_owner_failed: "centers.errors.addOwnerFailed",
     centers_add_staff_failed: "centers.errors.addStaffFailed",
+    centers_list_subcenters_failed: "subcenters.errors.loadFailed",
+    subcenter_not_found: "subcenters.errors.notFound",
+    subcenter_exists: "subcenters.errors.exists",
+    subcenter_has_staff: "subcenters.errors.hasStaff",
+    subcenter_mismatch: "subcenters.errors.mismatch",
+    subcenters_list_failed: "subcenters.errors.loadFailed",
+    subcenters_create_failed: "subcenters.errors.createFailed",
+    subcenters_update_failed: "subcenters.errors.updateFailed",
+    subcenters_delete_failed: "subcenters.errors.deleteFailed",
+    grade_not_found: "onboarding.errors.gradeNotFound",
+    grade_exists: "onboarding.errors.gradeExists",
+    major_not_found: "onboarding.errors.majorNotFound",
+    major_exists: "onboarding.errors.majorExists",
+    subject_not_found: "onboarding.errors.subjectNotFound",
+    subject_exists: "onboarding.errors.subjectExists",
+    academic_tree_failed: "onboarding.errors.treeFailed",
+    academic_add_grade_failed: "onboarding.errors.addGradeFailed",
+    academic_remove_grade_failed: "onboarding.errors.removeGradeFailed",
+    academic_add_major_failed: "onboarding.errors.addMajorFailed",
+    academic_remove_major_failed: "onboarding.errors.removeMajorFailed",
+    academic_add_subject_failed: "onboarding.errors.addSubjectFailed",
+    academic_remove_subject_failed: "onboarding.errors.removeSubjectFailed",
+    onboarding_required: "onboarding.errors.setupRequired",
+    onboarding_check_failed: "api.serverError",
+    teacher_not_found: "teachers.errors.notFound",
+    invalid_subject_selection: "teachers.errors.invalidSubjectSelection",
+    invalid_class_selection: "teachers.errors.invalidClassSelection",
+    teacher_list_failed: "teachers.errors.loadFailed",
+    teacher_create_failed: "teachers.errors.createFailed",
+    teacher_update_failed: "teachers.errors.updateFailed",
+    teacher_delete_failed: "teachers.errors.deleteFailed",
     network_error: "api.networkError",
   }
 
@@ -172,6 +203,51 @@ export function getCentersFieldMessage(
     "password.validation.required": "centers.errors.passwordRequired",
     "password.validation.min": "centers.errors.passwordMin",
     "role.validation.invalid": "centers.errors.roleInvalid",
+  }
+
+  const key = keyMap[`${field}.${code}`]
+  return key ? t(key) : undefined
+}
+
+/**
+ * Returns a translated error message for sub-center-specific fields (create
+ * / rename forms).
+ */
+export function getSubCentersFieldMessage(
+  t: Translate,
+  field: string,
+  code?: string
+) {
+  if (!code) return undefined
+
+  const keyMap: Record<string, string> = {
+    "name.validation.required": "subcenters.errors.nameRequired",
+    "name.validation.min": "subcenters.errors.nameMin",
+    "name.validation.taken": "subcenters.errors.exists",
+  }
+
+  const key = keyMap[`${field}.${code}`]
+  return key ? t(key) : undefined
+}
+
+/**
+ * Returns a translated error message for teacher-specific fields.
+ */
+export function getTeachersFieldMessage(
+  t: Translate,
+  field: string,
+  code?: string
+) {
+  if (!code) return undefined
+
+  const keyMap: Record<string, string> = {
+    "fullName.validation.required": "teachers.errors.fullNameRequired",
+    "fullName.validation.min": "teachers.errors.fullNameMin",
+    "email.validation.required": "teachers.errors.emailRequired",
+    "email.validation.email": "teachers.errors.emailInvalid",
+    "email.validation.taken": "teachers.errors.emailTaken",
+    "phone.validation.required": "teachers.errors.phoneRequired",
+    "phone.validation.min": "teachers.errors.phoneMin",
   }
 
   const key = keyMap[`${field}.${code}`]

@@ -38,6 +38,8 @@ export const centers = {
     email: "البريد الإلكتروني",
     password: "كلمة المرور",
     role: "الدور",
+    subCenter: "المركز الفرعي",
+    subCenterPlaceholder: "اختر مركزًا فرعيًا...",
   },
   detail: {
     back: "العودة إلى المراكز",

@@ -74,13 +74,15 @@ func (s *service) UpdateProfile(ctx context.Context, userID uint, req *UpdatePro
 		"email":    req.Email,
 	}, "system.events.v1.auth.profile_updated")
 
-	return &UserResponse{
-		ID:       user.ID,
-		Username: req.Username,
-		Email:    req.Email,
-		Role:     user.Role.Name,
-		Center:   centerResponse(user),
-	}, nil
+	user.Username = req.Username
+	user.Email = req.Email
+
+	resp, err := s.toUserResponse(user)
+	if err != nil {
+		s.publishError(ctx, types.ActionFailed, "User", err)
+		return nil, err
+	}
+	return &resp, nil
 }
 
 func (s *service) UpdatePassword(ctx context.Context, userID uint, req *UpdatePasswordRequest) error {
@@ -253,14 +255,14 @@ func (s *service) Login(ctx context.Context, req *LoginRequest) (*AuthResponse, 
 		"email":    user.Email,
 	}, "system.events.v1.auth.logged_in")
 
+	userResp, err := s.toUserResponse(user)
+	if err != nil {
+		s.publishError(ctx, types.ActionFailed, "User", err)
+		return nil, err
+	}
+
 	return &AuthResponse{
-		User: UserResponse{
-			ID:       user.ID,
-			Username: user.Username,
-			Email:    user.Email,
-			Role:     user.Role.Name,
-			Center:   centerResponse(user),
-		},
+		User:         userResp,
 		Token:        tokens.Token,
 		RefreshToken: tokens.RefreshToken,
 	}, nil
@@ -324,14 +326,14 @@ func (s *service) Refresh(ctx context.Context, refreshToken string) (*AuthRespon
 		"email":    user.Email,
 	}, "system.events.v1.auth.token_refreshed")
 
+	userResp, err := s.toUserResponse(user)
+	if err != nil {
+		s.publishError(ctx, types.ActionFailed, "User", err)
+		return nil, err
+	}
+
 	return &AuthResponse{
-		User: UserResponse{
-			ID:       user.ID,
-			Username: user.Username,
-			Email:    user.Email,
-			Role:     user.Role.Name,
-			Center:   centerResponse(user),
-		},
+		User:         userResp,
 		Token:        tokens.Token,
 		RefreshToken: tokens.RefreshToken,
 	}, nil
@@ -380,13 +382,12 @@ func (s *service) Me(ctx context.Context, userID uint) (*UserResponse, error) {
 		return nil, errors.New("user not found")
 	}
 
-	return &UserResponse{
-		ID:       user.ID,
-		Username: user.Username,
-		Email:    user.Email,
-		Role:     user.Role.Name,
-		Center:   centerResponse(user),
-	}, nil
+	resp, err := s.toUserResponse(user)
+	if err != nil {
+		s.publishError(ctx, types.ActionFailed, "User", err)
+		return nil, err
+	}
+	return &resp, nil
 }
 
 func centerResponse(user *User) *CenterResponse {
@@ -394,6 +395,29 @@ func centerResponse(user *User) *CenterResponse {
 		return nil
 	}
 	return &CenterResponse{ID: user.Center.ID, Name: user.Center.Name, Slug: user.Center.Slug}
+}
+
+// toUserResponse builds the public user shape, including whether the user's
+// center (if any) has completed academic setup — the signal the frontend
+// uses to gate center_owner access to the dashboard until onboarding is done.
+func (s *service) toUserResponse(user *User) (UserResponse, error) {
+	resp := UserResponse{
+		ID:       user.ID,
+		Username: user.Username,
+		Email:    user.Email,
+		Role:     user.Role.Name,
+		Center:   centerResponse(user),
+	}
+
+	if user.CenterID != nil {
+		setupComplete, err := s.repo.CenterAcademicSetupComplete(*user.CenterID)
+		if err != nil {
+			return UserResponse{}, err
+		}
+		resp.HasGrades = setupComplete
+	}
+
+	return resp, nil
 }
 
 func (s *service) issueAuthTokens(user *User, role string) (*AuthResponse, error) {

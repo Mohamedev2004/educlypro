@@ -4,6 +4,8 @@ import (
 	"errors"
 	"time"
 
+	"educlypro/shared/middleware"
+
 	"gorm.io/gorm"
 )
 
@@ -17,6 +19,12 @@ type Repository interface {
 	DeleteTokensByUserID(userID uint, tokenType string) error
 	DeleteToken(tokenStr string, tokenType string) error
 	FindByToken(tokenStr string) (*Token, error)
+	// CenterAcademicSetupComplete reports whether the given center's academic
+	// structure is usable. Delegates to shared/middleware, which is also
+	// where RequireAcademicSetup enforces the same rule on center_owner
+	// routes — one definition, used both for the has_grades field here and
+	// for actual server-side enforcement there.
+	CenterAcademicSetupComplete(centerID uint) (bool, error)
 }
 
 type repository struct {
@@ -95,4 +103,8 @@ func (r *repository) FindByToken(tokenStr string) (*Token, error) {
 		return nil, err
 	}
 	return &token, nil
+}
+
+func (r *repository) CenterAcademicSetupComplete(centerID uint) (bool, error) {
+	return middleware.CenterAcademicSetupComplete(r.db, centerID)
 }

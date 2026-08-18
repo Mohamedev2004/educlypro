@@ -11,6 +11,8 @@ export const roles = {
   logs: "Journaux d'Activités",
   notifications: "Notifications",
   staff: "Personnel",
+  subCenters: "Sous-centres",
+  teachers: "Enseignants",
   centers: "Centres",
   scanner: "Scanner",
   students: "Étudiants",

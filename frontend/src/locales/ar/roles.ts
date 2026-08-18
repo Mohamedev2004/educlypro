@@ -10,6 +10,8 @@ export const roles = {
   logs: "السجلات",
   notifications: "الإشعارات",
   staff: "الموظفون",
+  subCenters: "المراكز الفرعية",
+  teachers: "الأساتذة",
   centers: "المراكز",
   scanner: "الماسح",
   students: "الطلاب",

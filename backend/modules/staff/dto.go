@@ -8,31 +8,37 @@ const (
 // CreateRequest creates a center_scanner or center_receptionist user.
 // CenterID is required and is validated server-side against the requesting
 // owner's own center — it is never trusted for authorization on its own.
+// SubCenterID is likewise required and validated to belong to that same
+// center — every staff member must be assigned to exactly one sub-center.
 type CreateRequest struct {
-	Username string `json:"username" binding:"required,min=3,max=100"`
-	Email    string `json:"email" binding:"required,email,max=150"`
-	Password string `json:"password" binding:"required,min=6,max=72"`
-	Role     string `json:"role" binding:"required,oneof=center_scanner center_receptionist"`
-	CenterID uint   `json:"center_id" binding:"required"`
+	Username    string `json:"username" binding:"required,min=3,max=100"`
+	Email       string `json:"email" binding:"required,email,max=150"`
+	Password    string `json:"password" binding:"required,min=6,max=72"`
+	Role        string `json:"role" binding:"required,oneof=center_scanner center_receptionist"`
+	CenterID    uint   `json:"center_id" binding:"required"`
+	SubCenterID uint   `json:"sub_center_id" binding:"required"`
 }
 
 // UpdateRequest updates an existing staff member. Password is optional — a
 // nil/omitted value leaves the current password unchanged.
 type UpdateRequest struct {
-	Username string  `json:"username" binding:"required,min=3,max=100"`
-	Email    string  `json:"email" binding:"required,email,max=150"`
-	Role     string  `json:"role" binding:"required,oneof=center_scanner center_receptionist"`
-	Password *string `json:"password" binding:"omitempty,min=6,max=72"`
-	CenterID uint    `json:"center_id" binding:"required"`
+	Username    string  `json:"username" binding:"required,min=3,max=100"`
+	Email       string  `json:"email" binding:"required,email,max=150"`
+	Role        string  `json:"role" binding:"required,oneof=center_scanner center_receptionist"`
+	Password    *string `json:"password" binding:"omitempty,min=6,max=72"`
+	CenterID    uint    `json:"center_id" binding:"required"`
+	SubCenterID uint    `json:"sub_center_id" binding:"required"`
 }
 
 type Response struct {
-	ID        uint   `json:"id"`
-	Username  string `json:"username"`
-	Email     string `json:"email"`
-	Role      string `json:"role"`
-	CenterID  uint   `json:"center_id"`
-	CreatedAt string `json:"created_at"`
+	ID            uint   `json:"id"`
+	Username      string `json:"username"`
+	Email         string `json:"email"`
+	Role          string `json:"role"`
+	CenterID      uint   `json:"center_id"`
+	SubCenterID   uint   `json:"sub_center_id"`
+	SubCenterName string `json:"sub_center_name"`
+	CreatedAt     string `json:"created_at"`
 }
 
 var AllowedPerPage = map[int]struct{}{

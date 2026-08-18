@@ -4,7 +4,9 @@ import type { RolePageGroup } from "@/types/navigation.types"
 import {
   BellRing,
   University,
+  Building2,
   ChartBar,
+  GraduationCap,
   History,
   QrCode,
   UserKey,
@@ -26,8 +28,27 @@ const dashboardPathByRole: Record<Role, string> = {
   center_receptionist: "/center-receptionist/dashboard",
 }
 
+// The one place a center_owner without grades is always allowed to be.
+export const ONBOARDING_PATH = "/center-owner/onboarding"
+
 export function getDashboardPath(role: Role): string {
   return dashboardPathByRole[role]
+}
+
+// A center_owner can't use the dashboard (or anything else past login)
+// until their center has at least one grade — this is the "at least one
+// grade" gate the whole app enforces.
+export function needsOnboarding(user: User | null): boolean {
+  return !!user && user.role === "center_owner" && !user.has_grades
+}
+
+// Where a user should land right after authenticating (login, or an
+// already-authenticated visit to a public-only route): onboarding if the
+// gate above applies, otherwise their role's dashboard.
+export function getPostLoginPath(user: User | null): string {
+  if (!user) return "/login"
+  if (needsOnboarding(user)) return ONBOARDING_PATH
+  return getDashboardPath(user.role)
 }
 
 export function getRolePages(
@@ -83,6 +104,16 @@ export function getRolePages(
             title: t("roles.staff"),
             url: "/center-owner/staff",
             icon: UserKey,
+          },
+          {
+            title: t("roles.subCenters"),
+            url: "/center-owner/subcenters",
+            icon: Building2,
+          },
+          {
+            title: t("roles.teachers"),
+            url: "/center-owner/teachers",
+            icon: GraduationCap,
           },
         ],
       },

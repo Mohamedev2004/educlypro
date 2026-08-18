@@ -28,34 +28,74 @@ interface ColumnHandlers {
   onDelete: (staff: Staff) => void
 }
 
-export const createColumns = ({ t, onEdit, onDelete }: ColumnHandlers): ColumnDef<Staff>[] => [
+export const createColumns = ({
+  t,
+  onEdit,
+  onDelete,
+}: ColumnHandlers): ColumnDef<Staff>[] => [
   {
     accessorKey: "username",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title={t("staff.columns.username")} t={t} />
+      <DataTableColumnHeader
+        column={column}
+        title={t("staff.columns.username")}
+        t={t}
+      />
     ),
-    cell: ({ row }) => <span className="font-medium">{row.original.username}</span>,
+    cell: ({ row }) => (
+      <span className="font-medium">{row.original.username}</span>
+    ),
   },
   {
     accessorKey: "email",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title={t("staff.columns.email")} t={t} />
+      <DataTableColumnHeader
+        column={column}
+        title={t("staff.columns.email")}
+        t={t}
+      />
     ),
-    cell: ({ row }) => <span className="text-muted-foreground">{row.original.email}</span>,
+    cell: ({ row }) => (
+      <span className="text-muted-foreground">{row.original.email}</span>
+    ),
   },
   {
     accessorKey: "role",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title={t("staff.columns.role")} t={t} />
+      <DataTableColumnHeader
+        column={column}
+        title={t("staff.columns.role")}
+        t={t}
+      />
     ),
     cell: ({ row }) => (
       <Badge variant="secondary">{t(roleLabels[row.original.role])}</Badge>
     ),
   },
   {
+    accessorKey: "sub_center_name",
+    enableSorting: false,
+    header: ({ column }) => (
+      <DataTableColumnHeader
+        column={column}
+        title={t("staff.columns.subCenter")}
+        t={t}
+      />
+    ),
+    cell: ({ row }) => (
+      <span className="text-muted-foreground">
+        {row.original.sub_center_name}
+      </span>
+    ),
+  },
+  {
     accessorKey: "created_at",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title={t("staff.columns.createdAt")} t={t} />
+      <DataTableColumnHeader
+        column={column}
+        title={t("staff.columns.createdAt")}
+        t={t}
+      />
     ),
     cell: ({ row }) => (
       <span className="text-muted-foreground">

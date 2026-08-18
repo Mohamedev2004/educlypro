@@ -15,6 +15,8 @@ export type Staff = {
   email: string
   role: StaffRole
   center_id: number
+  sub_center_id: number
+  sub_center_name: string
   created_at: string
 }
 
@@ -47,6 +49,7 @@ export type CreateStaffPayload = {
   password: string
   role: StaffRole
   center_id: number
+  sub_center_id: number
 }
 
 export type UpdateStaffPayload = {
@@ -55,6 +58,7 @@ export type UpdateStaffPayload = {
   role: StaffRole
   password?: string
   center_id: number
+  sub_center_id: number
 }
 
 export type StaffListEnvelope = ApiEnvelope<StaffListData>

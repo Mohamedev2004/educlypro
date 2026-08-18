@@ -1,9 +1,11 @@
 package database
 
 import (
+	"educlypro/modules/academic"
 	"educlypro/modules/auth"
 	"educlypro/modules/logs" // Your new logs module
 	"educlypro/modules/notifications"
+	"educlypro/modules/teachers"
 	"log"
 )
 
@@ -13,8 +15,14 @@ func Migrate() {
 		&auth.Role{},
 		&auth.User{},
 		&auth.Center{},
+		&auth.SubCenter{},
 		&auth.Token{},
 		&notifications.Notification{},
+		&academic.Grade{},
+		&academic.Major{},
+		&academic.Subject{},
+		&academic.Class{},
+		&teachers.Teacher{},
 	); err != nil {
 		log.Fatal("Main DB Migration failed:", err)
 	}

@@ -17,6 +17,10 @@ type Repository interface {
 	CountByCenter(ctx context.Context, centerID uint, role, search string) (int64, error)
 	FindByIDInCenter(ctx context.Context, centerID, staffID uint) (*auth.User, error)
 	FindRoleIDByName(ctx context.Context, name string) (uint, error)
+	// FindSubCenter looks up a sub-center by id, regardless of which center
+	// it belongs to — the caller is responsible for checking CenterID
+	// matches the center the staff member is being assigned into.
+	FindSubCenter(ctx context.Context, subCenterID uint) (*auth.SubCenter, error)
 	Create(ctx context.Context, user *auth.User) error
 	Update(ctx context.Context, user *auth.User) error
 	SoftDelete(ctx context.Context, staffID uint) error
@@ -81,6 +85,7 @@ func (r *repository) ListByCenter(ctx context.Context, centerID uint, params Lis
 	err := r.staffQuery(centerID, params.Role, params.Search).
 		WithContext(ctx).
 		Preload("Role").
+		Preload("SubCenter").
 		Select("users.*").
 		Order(fmt.Sprintf("%s %s", orderColumn, direction)).
 		Limit(params.PerPage).
@@ -100,6 +105,7 @@ func (r *repository) FindByIDInCenter(ctx context.Context, centerID, staffID uin
 	var user auth.User
 	err := r.db.WithContext(ctx).
 		Preload("Role").
+		Preload("SubCenter").
 		Where("id = ? AND center_id = ?", staffID, centerID).
 		First(&user).Error
 	if err != nil {
@@ -119,6 +125,18 @@ func (r *repository) FindRoleIDByName(ctx context.Context, name string) (uint, e
 	return role.ID, nil
 }
 
+func (r *repository) FindSubCenter(ctx context.Context, subCenterID uint) (*auth.SubCenter, error) {
+	var sc auth.SubCenter
+	err := r.db.WithContext(ctx).First(&sc, subCenterID).Error
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, nil
+		}
+		return nil, err
+	}
+	return &sc, nil
+}
+
 func (r *repository) Create(ctx context.Context, user *auth.User) error {
 	return r.db.WithContext(ctx).Create(user).Error
 }
@@ -127,10 +145,11 @@ func (r *repository) Update(ctx context.Context, user *auth.User) error {
 	return r.db.WithContext(ctx).Model(&auth.User{}).
 		Where("id = ?", user.ID).
 		Updates(map[string]any{
-			"username": user.Username,
-			"email":    user.Email,
-			"role_id":  user.RoleID,
-			"password": user.Password,
+			"username":      user.Username,
+			"email":         user.Email,
+			"role_id":       user.RoleID,
+			"password":      user.Password,
+			"sub_center_id": user.SubCenterID,
 		}).Error
 }
 

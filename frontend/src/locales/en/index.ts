@@ -14,6 +14,9 @@ import { roles } from "./roles"
 import { staff } from "./staff"
 import { centers } from "./centers"
 import { table } from "./table"
+import { onboarding } from "./onboarding"
+import { subcenters } from "./subcenters"
+import { teachers } from "./teachers"
 
 export const en = {
   shell,
@@ -32,4 +35,7 @@ export const en = {
   staff,
   centers,
   table,
+  onboarding,
+  subcenters,
+  teachers,
 } as const

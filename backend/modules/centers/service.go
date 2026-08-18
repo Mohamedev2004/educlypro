@@ -4,18 +4,13 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"regexp"
-	"strings"
 	"time"
-	"unicode"
 
 	"educlypro/modules/auth"
 	"educlypro/modules/staff"
+	"educlypro/modules/subcenters"
 	"educlypro/shared/utils"
 
-	"golang.org/x/text/runes"
-	"golang.org/x/text/transform"
-	"golang.org/x/text/unicode/norm"
 	"gorm.io/gorm"
 )
 
@@ -36,15 +31,19 @@ type Service interface {
 	GetDetail(ctx context.Context, slug string) (*DetailResponse, error)
 	AddOwner(ctx context.Context, slug string, req *CreateOwnerRequest) (*OwnerResponse, error)
 	AddStaff(ctx context.Context, slug string, actorUserID uint, req *AddStaffRequest) (*staff.Response, error)
+	// ListSubCenters returns every sub-center of the given center — used to
+	// populate the sub-center picker in the "add staff" flow.
+	ListSubCenters(ctx context.Context, slug string) (*subcenters.ListResponse, error)
 }
 
 type service struct {
-	repo         Repository
-	staffService staff.Service
+	repo              Repository
+	staffService      staff.Service
+	subCentersService subcenters.Service
 }
 
-func NewService(repo Repository, staffService staff.Service) Service {
-	return &service{repo: repo, staffService: staffService}
+func NewService(repo Repository, staffService staff.Service, subCentersService subcenters.Service) Service {
+	return &service{repo: repo, staffService: staffService, subCentersService: subCentersService}
 }
 
 func (s *service) List(ctx context.Context, params ListParams) (*ListResponse, error) {
@@ -101,7 +100,7 @@ func (s *service) List(ctx context.Context, params ListParams) (*ListResponse, e
 const maxSlugAttempts = 100
 
 func (s *service) Create(ctx context.Context, req *CreateRequest) (*Response, error) {
-	base := slugify(req.Name)
+	base := utils.Slugify(req.Name, "center")
 
 	for attempt := 1; attempt <= maxSlugAttempts; attempt++ {
 		slug := base
@@ -228,12 +227,25 @@ func (s *service) AddStaff(ctx context.Context, slug string, actorUserID uint, r
 	}
 
 	return s.staffService.CreateForCenter(ctx, center.ID, actorUserID, &staff.CreateRequest{
-		Username: req.Username,
-		Email:    req.Email,
-		Password: req.Password,
-		Role:     req.Role,
-		CenterID: center.ID,
+		Username:    req.Username,
+		Email:       req.Email,
+		Password:    req.Password,
+		Role:        req.Role,
+		CenterID:    center.ID,
+		SubCenterID: req.SubCenterID,
 	})
+}
+
+func (s *service) ListSubCenters(ctx context.Context, slug string) (*subcenters.ListResponse, error) {
+	center, err := s.repo.FindBySlug(ctx, slug)
+	if err != nil {
+		return nil, err
+	}
+	if center == nil {
+		return nil, ErrCenterNotFound
+	}
+
+	return s.subCentersService.ListForCenter(ctx, center.ID)
 }
 
 func toResponse(c auth.Center, staffCount int64) Response {
@@ -251,47 +263,4 @@ func toResponse(c auth.Center, staffCount int64) Response {
 	}
 
 	return resp
-}
-
-var slugInvalidChars = regexp.MustCompile(`[^a-z0-9]+`)
-
-// slugMaxLen leaves room, within the 150-char `slug` column, for a "-NNN"
-// uniqueness suffix Create may need to append.
-const slugMaxLen = 140
-
-// slugify strips diacritics (e.g. "Café" -> "Cafe"), lowercases, replaces
-// runs of remaining non-alphanumeric characters (including any script that
-// isn't Latin/digits, e.g. Arabic or CJK, or symbols/emoji) with a single
-// hyphen, trims leading/trailing hyphens, and caps the length.
-//
-// Names that carry no representable ASCII content at all (e.g. purely
-// Arabic, purely emoji) collapse to an empty string here — Create's
-// insert-and-retry loop still produces a valid, unique slug for them by
-// falling back to "center", "center-2", etc.
-func slugify(s string) string {
-	s = stripDiacritics(s)
-	s = strings.ToLower(s)
-	s = slugInvalidChars.ReplaceAllString(s, "-")
-	s = strings.Trim(s, "-")
-
-	if len(s) > slugMaxLen {
-		s = strings.Trim(s[:slugMaxLen], "-")
-	}
-
-	if s == "" {
-		return "center"
-	}
-	return s
-}
-
-// stripDiacritics transliterates accented Latin characters to their plain
-// ASCII base (NFD-decompose, drop combining marks, NFC-recompose) so e.g.
-// "café" slugifies to "cafe" instead of being silently dropped.
-func stripDiacritics(s string) string {
-	t := transform.Chain(norm.NFD, runes.Remove(runes.In(unicode.Mn)), norm.NFC)
-	result, _, err := transform.String(t, s)
-	if err != nil {
-		return s
-	}
-	return result
 }

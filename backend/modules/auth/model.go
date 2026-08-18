@@ -32,6 +32,13 @@ type User struct {
 	// one center. Null for super_admin.
 	CenterID *uint   `json:"center_id" gorm:"index"`
 	Center   *Center `json:"-" gorm:"foreignKey:CenterID"`
+
+	// A center_scanner/center_receptionist belongs to exactly one sub-center
+	// within their center — which operational location they're assigned to.
+	// Null for super_admin and center_owner (and for staff created before
+	// this field existed).
+	SubCenterID *uint      `json:"sub_center_id" gorm:"index"`
+	SubCenter   *SubCenter `json:"-" gorm:"foreignKey:SubCenterID"`
 }
 
 type Token struct {
@@ -65,4 +72,18 @@ type Center struct {
 	CreatedAt time.Time      `json:"created_at"`
 	UpdatedAt time.Time      `json:"updated_at"`
 	DeletedAt gorm.DeletedAt `json:"-" gorm:"index"`
+}
+
+// SubCenter is an operational location within a center (e.g. a branch or
+// annex) — a center has many, a sub-center belongs to exactly one center.
+// It has no owner of its own: the center's owner (Center.OwnerID) manages
+// every one of its sub-centers.
+type SubCenter struct {
+	ID       uint    `json:"id" gorm:"primaryKey"`
+	CenterID uint    `json:"center_id" gorm:"not null;uniqueIndex:idx_subcenter_center_name"`
+	Center   *Center `json:"-" gorm:"foreignKey:CenterID;constraint:OnDelete:CASCADE"`
+	Name     string  `json:"name" gorm:"size:150;not null;uniqueIndex:idx_subcenter_center_name"`
+
+	CreatedAt time.Time `json:"created_at"`
+	UpdatedAt time.Time `json:"updated_at"`
 }

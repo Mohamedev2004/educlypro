@@ -11,6 +11,13 @@ type UserResponse struct {
 	Email    string          `json:"email"`
 	Role     string          `json:"role"`
 	Center   *CenterResponse `json:"center,omitempty"`
+	// HasGrades is true once the user's center has a usable academic
+	// structure: at least one grade, every grade has at least one major,
+	// and every major has at least one subject. Only meaningful for
+	// center-scoped users; always false otherwise. The frontend uses this
+	// to gate center_owner access to the dashboard until onboarding is
+	// complete.
+	HasGrades bool `json:"has_grades"`
 }
 
 type CenterResponse struct {

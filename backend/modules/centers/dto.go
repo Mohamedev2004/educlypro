@@ -66,12 +66,14 @@ type CreateOwnerRequest struct {
 // AddStaffRequest creates a center_scanner or center_receptionist account
 // for a specific center. Unlike staff.CreateRequest, the center is taken
 // from the URL (an admin acting on an arbitrary center), not from the
-// request body.
+// request body. SubCenterID is still required and is validated (by the
+// staff module) to belong to that same center.
 type AddStaffRequest struct {
-	Username string `json:"username" binding:"required,min=3,max=100"`
-	Email    string `json:"email" binding:"required,email,max=150"`
-	Password string `json:"password" binding:"required,min=6,max=72"`
-	Role     string `json:"role" binding:"required,oneof=center_scanner center_receptionist"`
+	Username    string `json:"username" binding:"required,min=3,max=100"`
+	Email       string `json:"email" binding:"required,email,max=150"`
+	Password    string `json:"password" binding:"required,min=6,max=72"`
+	Role        string `json:"role" binding:"required,oneof=center_scanner center_receptionist"`
+	SubCenterID uint   `json:"sub_center_id" binding:"required"`
 }
 
 type OwnerResponse struct {

@@ -38,6 +38,8 @@ export const centers = {
     email: "Email",
     password: "Password",
     role: "Role",
+    subCenter: "Sub-center",
+    subCenterPlaceholder: "Select a sub-center...",
   },
   detail: {
     back: "Back to centers",

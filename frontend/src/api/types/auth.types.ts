@@ -16,6 +16,9 @@ export interface User {
   email: string
   role: Role
   center?: Center
+  // True once the user's center has at least one grade. Only meaningful
+  // for center-scoped roles — drives the center_owner onboarding gate.
+  has_grades: boolean
 }
 
 export interface LoginPayload {

@@ -13,6 +13,8 @@ export const roles = {
   logs: "Activity Logs",
   notifications: "Notifications",
   staff: "Staff",
+  subCenters: "Sub-centers",
+  teachers: "Teachers",
   centers: "Centers",
   scanner: "Scanner",
   students: "Students",

@@ -38,6 +38,8 @@ export const centers = {
     email: "E-mail",
     password: "Mot de passe",
     role: "Rôle",
+    subCenter: "Sous-centre",
+    subCenterPlaceholder: "Sélectionner un sous-centre...",
   },
   detail: {
     back: "Retour aux centres",
@@ -52,7 +54,8 @@ export const centers = {
   createSuccess: "Centre créé.",
   createSuccessDescription: "Le nouveau centre est prêt à être configuré.",
   addOwnerSuccess: "Propriétaire ajouté.",
-  addOwnerSuccessDescription: "Le propriétaire du centre peut désormais se connecter.",
+  addOwnerSuccessDescription:
+    "Le propriétaire du centre peut désormais se connecter.",
   addStaffSuccess: "Membre du personnel ajouté.",
   addStaffSuccessDescription: "Le nouveau membre peut désormais se connecter.",
   errors: {
@@ -61,7 +64,8 @@ export const centers = {
     loadFailed: "Impossible de charger les centres. Veuillez réessayer.",
     createFailed: "Impossible de créer le centre. Veuillez réessayer.",
     addOwnerFailed: "Impossible d'ajouter le propriétaire. Veuillez réessayer.",
-    addStaffFailed: "Impossible d'ajouter le membre du personnel. Veuillez réessayer.",
+    addStaffFailed:
+      "Impossible d'ajouter le membre du personnel. Veuillez réessayer.",
     nameRequired: "Le nom est requis.",
     nameMin: "Le nom doit contenir au moins 2 caractères.",
     usernameRequired: "Le nom d'utilisateur est requis.",

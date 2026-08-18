@@ -21,6 +21,7 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { useStaffForm } from "@/hooks/staff/use-staff-form"
+import { useSubCentersList } from "@/hooks/subcenters/use-subcenters-list"
 import type { Staff } from "@/api/types/staff.types"
 
 /**
@@ -60,13 +61,18 @@ export function StaffFormDialog({
     setRole,
     password,
     setPassword,
+    subCenterId,
+    setSubCenterId,
     errors,
     isSubmitting,
     handleSubmit,
-  } = useStaffForm(t, centerId, staff, () => {
+  } = useStaffForm(t, open, centerId, staff, () => {
     onOpenChange(false)
     onSuccess()
   })
+
+  const { data: subCentersData } = useSubCentersList()
+  const subCenters = subCentersData?.items ?? []
 
   const submit: FormEventHandler = async (event) => {
     event.preventDefault()
@@ -81,7 +87,9 @@ export function StaffFormDialog({
             {isEdit ? t("staff.dialog.editTitle") : t("staff.dialog.addTitle")}
           </DialogTitle>
           <DialogDescription>
-            {isEdit ? t("staff.dialog.editDescription") : t("staff.dialog.addDescription")}
+            {isEdit
+              ? t("staff.dialog.editDescription")
+              : t("staff.dialog.addDescription")}
           </DialogDescription>
         </DialogHeader>
 
@@ -97,7 +105,9 @@ export function StaffFormDialog({
               required
             />
             {errors.username && (
-              <span className="text-xs text-destructive">{errors.username}</span>
+              <span className="text-xs text-destructive">
+                {errors.username}
+              </span>
             )}
           </div>
 
@@ -118,25 +128,68 @@ export function StaffFormDialog({
 
           <div className="grid gap-2">
             <Label htmlFor="staff-role">{t("staff.fields.role")}</Label>
-            <Select value={role} onValueChange={(value) => setRole(value as typeof role)}>
+            <Select
+              value={role}
+              onValueChange={(value) => setRole(value as typeof role)}
+            >
               <SelectTrigger id="staff-role" className="w-full">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="center_scanner">{t("roles.center_scanner")}</SelectItem>
+                <SelectItem value="center_scanner">
+                  {t("roles.center_scanner")}
+                </SelectItem>
                 <SelectItem value="center_receptionist">
                   {t("roles.center_receptionist")}
                 </SelectItem>
               </SelectContent>
             </Select>
-            {errors.role && <span className="text-xs text-destructive">{errors.role}</span>}
+            {errors.role && (
+              <span className="text-xs text-destructive">{errors.role}</span>
+            )}
+          </div>
+
+          <div className="grid gap-2">
+            <Label htmlFor="staff-subcenter">
+              {t("staff.fields.subCenter")}
+            </Label>
+            <Select
+              value={subCenterId ? String(subCenterId) : ""}
+              onValueChange={(value) => setSubCenterId(Number(value))}
+            >
+              <SelectTrigger
+                id="staff-subcenter"
+                className={
+                  errors.subCenterId ? "w-full border-destructive" : "w-full"
+                }
+              >
+                <SelectValue
+                  placeholder={t("staff.fields.subCenterPlaceholder")}
+                />
+              </SelectTrigger>
+              <SelectContent>
+                {subCenters.map((subCenter) => (
+                  <SelectItem key={subCenter.id} value={String(subCenter.id)}>
+                    {subCenter.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            {errors.subCenterId && (
+              <span className="text-xs text-destructive">
+                {errors.subCenterId}
+              </span>
+            )}
           </div>
 
           <div className="grid gap-2">
             <Label htmlFor="staff-password">
               {t("staff.fields.password")}
               {isEdit && (
-                <span className="text-muted-foreground"> {t("staff.fields.passwordEditHint")}</span>
+                <span className="text-muted-foreground">
+                  {" "}
+                  {t("staff.fields.passwordEditHint")}
+                </span>
               )}
             </Label>
             <PasswordInput
@@ -148,18 +201,26 @@ export function StaffFormDialog({
               required={!isEdit}
             />
             {errors.password && (
-              <span className="text-xs text-destructive">{errors.password}</span>
+              <span className="text-xs text-destructive">
+                {errors.password}
+              </span>
             )}
           </div>
 
           {errors.general && (
-            <div className="text-sm font-medium text-destructive">{errors.general}</div>
+            <div className="text-sm font-medium text-destructive">
+              {errors.general}
+            </div>
           )}
 
           <DialogFooter>
             <Button type="submit" disabled={isSubmitting}>
-              {isSubmitting && <LoaderCircle className="mr-2 h-4 w-4 animate-spin" />}
-              {isEdit ? t("staff.dialog.submitEdit") : t("staff.dialog.submitAdd")}
+              {isSubmitting && (
+                <LoaderCircle className="mr-2 h-4 w-4 animate-spin" />
+              )}
+              {isEdit
+                ? t("staff.dialog.submitEdit")
+                : t("staff.dialog.submitAdd")}
             </Button>
           </DialogFooter>
         </form>

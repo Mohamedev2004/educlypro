@@ -8,15 +8,23 @@ import { Button } from "@/components/ui/button"
 import { AppFullscreen } from "@/components/app-fullscreen"
 import { useTheme } from "@/components/theme-provider"
 import { AppLanguage } from "@/components/app-language"
+import { cn } from "@/utils/ui-utils"
 
 type AuthLayoutProps = {
   children: ReactNode
+  // Overrides the content column's max width — defaults to the narrow
+  // max-w-sm form column every auth page uses. Wider flows (e.g. the
+  // onboarding wizard) can widen it without affecting any other page.
+  contentClassName?: string
 }
 
-export default function AuthLayout({ children }: AuthLayoutProps) {
+export default function AuthLayout({
+  children,
+  contentClassName,
+}: AuthLayoutProps) {
   const { direction, locale, setLocale, t } = useDirection()
   const { theme, setTheme } = useTheme()
-  
+
   const isDark =
     theme === "dark" ||
     (theme === "system" &&
@@ -31,10 +39,7 @@ export default function AuthLayout({ children }: AuthLayoutProps) {
         dir="ltr"
         className="fixed top-4 right-1/2 z-50 flex items-center justify-end gap-2"
       >
-        <AppLanguage
-          locale={locale}
-          setLocale={(v) => setLocale(v as any)}
-        />
+        <AppLanguage locale={locale} setLocale={(v) => setLocale(v as any)} />
 
         <AppFullscreen />
 
@@ -44,8 +49,8 @@ export default function AuthLayout({ children }: AuthLayoutProps) {
           onClick={toggleTheme}
           className="relative size-9"
         >
-          <Sun className="size-4 transition-all dark:-rotate-90 dark:scale-0" />
-          <Moon className="absolute size-4 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
+          <Sun className="size-4 transition-all dark:scale-0 dark:-rotate-90" />
+          <Moon className="absolute size-4 scale-0 rotate-90 transition-all dark:scale-100 dark:rotate-0" />
         </Button>
       </div>
 
@@ -68,14 +73,12 @@ export default function AuthLayout({ children }: AuthLayoutProps) {
           direction === "rtl" ? "lg:order-2" : "lg:order-1",
         ].join(" ")}
       >
-        <div className="w-full max-w-sm space-y-6">
-
+        <div className={cn("w-full space-y-6", contentClassName ?? "max-w-sm")}>
           {/* Logo */}
-          <div className="flex items-center gap-2 self-center justify-center font-medium">
+          <div className="flex items-center justify-center gap-2 self-center font-medium">
             <div className="flex size-8 items-center justify-center rounded-md bg-primary text-primary-foreground">
               <GalleryVerticalEnd className="size-4" />
             </div>
-
             {t("shell.appName")}.
           </div>
 
@@ -95,12 +98,11 @@ export default function AuthLayout({ children }: AuthLayoutProps) {
               className="underline underline-offset-4 hover:text-primary"
             >
               Privacy Policy
-            </Link>.
+            </Link>
+            .
           </p>
-
         </div>
       </div>
-
     </div>
   )
 }
